@@ -61,7 +61,7 @@
 }
 
 .md-typeset .casebook-table {
-  width: min(100%, 680px);
+  width: min(100%, 36rem);
   margin: 1.15rem 0 1.6rem;
 }
 
@@ -74,7 +74,37 @@
 .md-typeset .casebook-table table:not([class]) {
   display: table !important;
   width: 100% !important;
+  min-width: 0;
   max-width: none;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: #ffffff;
+  border: 1px solid var(--table-border);
+  border-radius: 0;
+}
+
+.md-typeset .casebook-table table:not([class]) th,
+.md-typeset .casebook-table table:not([class]) td {
+  padding: 0.75rem 0.9rem;
+  border: 0;
+  vertical-align: middle;
+}
+
+.md-typeset .casebook-table table:not([class]) thead th {
+  background: rgba(69, 90, 100, 0.05);
+  color: var(--table-text);
+  font-weight: 600;
+  text-align: center !important;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.md-typeset .casebook-table table:not([class]) tbody td {
+  text-align: center !important;
+}
+
+.md-typeset .casebook-table table:not([class]) tbody tr + tr td {
+  border-top: 1px solid var(--table-border);
 }
 
 .md-typeset__table {
@@ -158,5 +188,5 @@
 
 .md-typeset .casebook-table--numeric th,
 .md-typeset .casebook-table--numeric td {
-  text-align: right !important;
+  text-align: center !important;
 }
