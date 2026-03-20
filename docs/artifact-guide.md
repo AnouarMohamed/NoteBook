@@ -3,24 +3,6 @@
 This page describes the files produced by the standard experiment and gallery workflows.
 {: .lead }
 
-<div class="metric-grid" markdown>
-<div class="metric-card" markdown>
-<div class="metric-label">Per Experiment</div>
-<div class="metric-value">6</div>
-<div class="metric-note">Each run writes four figures, one JSON summary, and one markdown report.</div>
-</div>
-<div class="metric-card" markdown>
-<div class="metric-label">Per Gallery</div>
-<div class="metric-value">4</div>
-<div class="metric-note">Top-level gallery outputs summarize the full built-in example set.</div>
-</div>
-<div class="metric-card" markdown>
-<div class="metric-label">Reading Layers</div>
-<div class="metric-value">3</div>
-<div class="metric-note">Figures, structured data, and markdown summaries are all produced together.</div>
-</div>
-</div>
-
 ## Single-Experiment Artifacts
 
 A call to `save_experiment_artifacts(...)` or `mot-uniform` writes the following files.
@@ -47,16 +29,13 @@ A call to `save_gallery_assets(...)` or `mot-gallery` writes gallery-level files
 
 ## Per-Example Directory Structure
 
-<div class="card-grid" markdown>
-<div class="card" markdown>
-### Example Directories
+Typical example directories include:
 
 - `docs/assets/gallery/uniform_abs_spread/`
 - `docs/assets/gallery/wide_put/`
 - `docs/assets/gallery/broad_straddle/`
-</div>
-<div class="card" markdown>
-### Typical Contents
+
+Typical contents are:
 
 - exact summary figure
 - regularization path
@@ -64,8 +43,6 @@ A call to `save_gallery_assets(...)` or `mot-gallery` writes gallery-level files
 - structural diagnostics
 - `summary.json`
 - `experiment_report.md`
-</div>
-</div>
 
 ## Recommended Reading Order
 

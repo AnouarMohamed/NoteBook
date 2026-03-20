@@ -3,24 +3,6 @@
 This page summarizes the command-line interfaces shipped with the project and the artifact files they generate.
 {: .lead }
 
-<div class="metric-grid" markdown>
-<div class="metric-card" markdown>
-<div class="metric-label">Commands</div>
-<div class="metric-value">2</div>
-<div class="metric-note">`mot-uniform` for single experiments and `mot-gallery` for the curated example set.</div>
-</div>
-<div class="metric-card" markdown>
-<div class="metric-label">Single-Run Artifacts</div>
-<div class="metric-value">6</div>
-<div class="metric-note">Figures, JSON summary, and markdown report written per experiment.</div>
-</div>
-<div class="metric-card" markdown>
-<div class="metric-label">Gallery Files</div>
-<div class="metric-value">4</div>
-<div class="metric-note">Overview plot, summary table, JSON summary, and generated casebook.</div>
-</div>
-</div>
-
 ## `mot-uniform`
 
 `mot-uniform` runs a two-uniform experiment with a configurable payoff and writes the standard artifact set.
@@ -59,18 +41,12 @@ mot-uniform --n 60 --x-interval 1 3 --y-interval 0 4 --payoff call_on_spread --s
 
 ### Standard Output Files
 
-<div class="card-grid" markdown>
-<div class="card" markdown>
 - `exact_uniform_summary.png`
 - `regularization_path.png`
 - `stability_diagnostics.png`
-</div>
-<div class="card" markdown>
 - `structural_diagnostics.png`
 - `summary.json`
 - `experiment_report.md`
-</div>
-</div>
 
 ## `mot-gallery`
 
