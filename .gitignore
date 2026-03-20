@@ -10,7 +10,7 @@ dist/
 
 .ipynb_checkpoints/
 
-artifacts/
+artifacts*/
 
 .DS_Store
 Thumbs.db
