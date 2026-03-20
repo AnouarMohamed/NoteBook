@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mot-pricing"
+version = "0.1.0"
+description = "Exact and entropic martingale optimal transport experiments for robust pricing."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "matplotlib>=3.8",
+  "numpy>=1.26",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+]
+
+[project.scripts]
+mot-uniform = "mot_pricing.cli:main"
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
