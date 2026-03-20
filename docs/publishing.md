@@ -1,22 +1,22 @@
 ﻿# Publishing
 
-This page is intentionally plainspoken. Package publishing is not where I look for poetry; it is where I look for exact strings that either match or fail.
+This page summarizes the package publishing workflow and the associated one-time configuration steps.
 {: .lead }
 
 ## GitHub Releases
 
-Tag pushes like `v0.4.0` trigger the release workflow and attach the wheel and source distribution to a GitHub release.
+Tag pushes such as `v0.4.0` trigger the release workflow and attach the wheel and source distribution to a GitHub release.
 
 ## PyPI Workflow
 
 This repository includes a manual GitHub Actions workflow for package publishing.
 
-It supports:
+Supported targets:
 
-- `TestPyPI` publishing
-- `PyPI` publishing
+- `TestPyPI`
+- `PyPI`
 
-The workflow uses trusted publishing via GitHub OIDC, which is the setup I prefer because it avoids long-lived upload tokens quietly aging in a drawer.
+The workflow uses trusted publishing via GitHub OIDC.
 
 ## Current Status
 
@@ -26,7 +26,7 @@ For this repository:
 - TestPyPI publishing is configured
 - PyPI publishing is configured
 
-## One-Time Setup On PyPI For A New Repository
+## One-Time Setup For A New Repository
 
 For a different repository, the one-time setup is:
 
@@ -42,22 +42,22 @@ Recommended mapping for this project:
 - workflow: `publish-package.yml`
 - environment: `testpypi` or `pypi`
 
-If the GitHub repository is renamed later, the trusted publisher entry on PyPI and TestPyPI must be updated to match. OIDC is very exact about identity, which is good for security and occasionally irritating for people who rename repositories on a Tuesday.
+If the GitHub repository is renamed later, the trusted publisher entry on PyPI and TestPyPI must be updated to match the new repository name.
 
 ## Rename Troubleshooting
 
-If publishing starts failing right after a repository rename, check these exact values on both TestPyPI and PyPI:
+If publishing fails after a repository rename, check the following values on both TestPyPI and PyPI:
 
 - owner: `AnouarMohamed`
 - repository: `NoteBook`
 - workflow: `publish-package.yml`
 - environment: `testpypi` for TestPyPI and `pypi` for PyPI
 
-Also update the local Git remote and any repository URLs in docs or package metadata so badges, docs links, and Pages URLs point at the renamed repository.
+Repository URLs in local git configuration, documentation, and package metadata should also be updated.
 
-## How I Publish
+## Publishing Procedure
 
-1. Build confidence first:
+1. Run local verification:
 
    ```bash
    pytest
@@ -69,11 +69,9 @@ Also update the local Git remote and any repository URLs in docs or package meta
 3. Run the `Publish Package` workflow.
 4. Choose `testpypi` or `pypi`.
 
-That is the whole routine. If those verification commands fail locally, I do not bother asking the workflow to be brave on my behalf.
-
 ## Docs Site
 
-The docs site is deployed from GitHub Actions using the `Docs` workflow and GitHub Pages.
+The documentation site is deployed from GitHub Actions using the `Docs` workflow and GitHub Pages.
 
 If GitHub Pages is not already configured:
 

@@ -1,9 +1,7 @@
 ﻿# MOT Pricing
 
-I built `mot-pricing` because the original notebook had a real mathematical question inside it, plus the usual notebook habit of doing six jobs at once. The question is serious: if I know the marginals of `S1` and `S2`, and I insist on the martingale condition `E[S2 | S1] = S1`, what can I honestly say about the price of a payoff? The package is my attempt to answer that cleanly, reproducibly, and without making the numerics sound wiser than they are.
+`mot-pricing` is a small research-oriented package for robust pricing under martingale optimal transport constraints. It grew out of a single exploratory notebook and is now organized as a reproducible library with exact solvers, regularized solvers, reporting utilities, and a documented experiment gallery.
 {: .lead }
-
-> The exact LP solver is the part I trust like a theorem. The entropic solver is the part I trust like a very talented approximation with good bedside manners.
 
 Public links:
 
@@ -12,17 +10,17 @@ Public links:
 - Docs: `https://anouarmohamed.github.io/NoteBook/`
 - Repository: `https://github.com/AnouarMohamed/NoteBook`
 
-## The Problem In One Breath
+## Core Problem
 
-The core object is a coupling `P` such that:
+The package studies couplings `P` such that:
 
 - `S1 ~ mu1`
 - `S2 ~ mu2`
 - `E[S2 | S1] = S1`
 
-Then I maximize or minimize `E_P[payoff(S1, S2)]` over all such couplings.
+and optimizes `E_P[payoff(S1, S2)]` over all such couplings.
 
-In discrete form, that becomes the linear program I actually care about:
+In discrete form, the associated linear program is:
 
 ```text
 maximize or minimize   sum_{i,j} pi_ij c(x_i, y_j)
@@ -32,56 +30,54 @@ subject to             sum_j pi_ij = mu_i
                        pi_ij >= 0
 ```
 
-That formulation is blunt in a good way. Every modeling commitment is sitting on the table.
+This formulation makes the marginal constraints, martingale restrictions, and payoff functional explicit.
 
-## What The Gallery Is Saying Right Now
+## Current Gallery Summary
 
-The current built-in gallery gives a nice spread of behaviors:
+The built-in gallery currently includes seven examples with distinct numerical characteristics:
 
-- The reference `|S2 - S1|` experiment lands at a discrete lower bound of `0.6087` and upper bound of `0.9975`.
-- The call-on-spread case is narrower, with bounds `0.1894` to `0.3841`.
-- The put-on-spread sibling sits higher, from `0.4394` to `0.6341`.
-- The centered straddle is the most dramatic example in the shipped gallery, with interval width about `0.4155`.
-- The wider absolute-spread system pushes the upper bound to `1.3101` and is the broadest absolute-spread experiment on the site.
-- The quadratic spread behaves almost suspiciously well: lower and upper agree to four decimals, so the interval collapses numerically in this setup.
+- The reference `|S2 - S1|` experiment has discrete bounds `0.6087` and `0.9975`.
+- The call-on-spread example has bounds `0.1894` and `0.3841`.
+- The put-on-spread example has bounds `0.4394` and `0.6341`.
+- The centered spread straddle has interval width approximately `0.4155`.
+- The wide absolute-spread example raises the upper bound to `1.3101`.
+- The quadratic spread example collapses numerically to a nearly degenerate interval.
 
-I like that mix because it shows more than one personality of the problem. Some payoffs care mostly about dispersion, some care about direction, and some turn out to be far more rigid than they first appear.
+Taken together, these examples illustrate directional, symmetric, and variance-sensitive payoff structures.
 
-## Why I Bothered Packaging This
+## Why The Package Exists
 
-The notebook was a good start, but I did not want the final story to depend on which cell happened to be run last. The package version fixes a few important things:
+The original notebook combined derivation, experimentation, plotting, and solver logic in a single environment. The package version separates these concerns and addresses several issues from the notebook stage:
 
 - unrestricted coupling benchmarks are labeled correctly
-- the regularized dual is compared to the regularized primal, not to raw `E[payoff]`
-- the regularized update is handled in log space instead of asking exponentials to behave heroically
-- convex-order feasibility is checked explicitly before I pretend a martingale should exist
-- experiments now write plots and machine-readable summaries instead of evaporating into notebook state
+- the regularized dual is compared against the regularized primal rather than raw `E[payoff]`
+- the regularized update is handled in log space for improved numerical stability
+- convex-order feasibility is checked explicitly before solving
+- experiments produce plots and machine-readable summaries as standard artifacts
 
-## What Is On This Site
+## Documentation Structure
 
-- [Research Notes](research-notes.md): the modeling point of view, what I think is exact, and what I treat as approximation.
-- [Numerical Notes](numerical-notes.md): how I read dual gaps, martingale errors, and `eps`-dependent behavior without becoming mystical about it.
-- [Getting Started](getting-started.md): the shortest path from `pip install` to actual artifacts on disk.
-- [Examples](examples.md): the gallery, with commentary instead of plot-dumping.
-- [API Guide](api.md): the functions I would actually import if I were scripting experiments.
-- [Upgrade Notes](upgrade_notes.md): what changed when the notebook became a package.
-- [Publishing](publishing.md): release and trusted-publisher notes for this repository.
+- [Research Notes](research-notes.md): modeling assumptions and interpretation of exact versus regularized results
+- [Numerical Notes](numerical-notes.md): diagnostics, convergence behavior, and practical numerical considerations
+- [Getting Started](getting-started.md): installation, CLI usage, and artifact generation
+- [Examples](examples.md): the experiment gallery with numerical summaries and interpretation
+- [API Guide](api.md): principal public entry points for scripting and analysis
+- [Upgrade Notes](upgrade_notes.md): transition from notebook to package
+- [Publishing](publishing.md): release and trusted-publisher configuration notes
 
-## What I Think This Project Is Good For
+## Typical Uses
 
-- getting exact discrete MOT bounds for two-step experiments
-- sanity-checking entropic approximations against an LP benchmark
-- comparing how different spread-type payoffs respond to the same marginals
-- producing reproducible plots and JSON summaries for research notes or small reports
-- learning the geometry of simple martingale constraints without dragging in an entire industrial stack
+- computing exact discrete MOT bounds for two-step problems
+- comparing regularized approximations against LP benchmarks
+- studying the effect of different payoff structures under common marginals
+- generating reproducible figures and JSON summaries for notes or reports
+- exploring basic martingale geometry in a compact computational setting
 
-## Start Here
+## Suggested Reading Order
 
-If you want the fast route:
+1. [Getting Started](getting-started.md)
+2. [Examples](examples.md)
+3. [Numerical Notes](numerical-notes.md)
+4. [Research Notes](research-notes.md)
 
-1. go to [Getting Started](getting-started.md)
-2. run `mot-uniform` once
-3. open [Examples](examples.md)
-4. read [Numerical Notes](numerical-notes.md) before trusting very small `eps` too much
-
-That order mirrors how I use the repo myself: first make it run, then make it interesting, then decide what deserves confidence.
+This order moves from execution to interpretation.

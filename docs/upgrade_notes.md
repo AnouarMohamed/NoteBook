@@ -1,35 +1,35 @@
 ﻿# Upgrade Notes
 
-This project started as a single exploratory notebook. I liked the mathematics, but the code was doing what notebooks often do: derivation, experiments, plotting, and numerical bookkeeping were all leaning on each other a little too hard.
+This repository began as a single exploratory notebook and was later reorganized into a small Python project.
 {: .lead }
 
-## What Changed
+## Main Structural Changes
 
-The rewrite pulled the project into a cleaner shape:
+The project was upgraded by introducing:
 
-- solver logic moved into `src/mot_pricing/`
-- tests were added for exact, regularized, and reporting workflows
-- packaging metadata and CLI entry points were added
-- gallery generation and machine-readable summaries were added
-- docs, CI, release workflows, and publishing workflows were added
+- solver logic in `src/mot_pricing/`
+- tests for exact, regularized, reporting, and gallery workflows
+- packaging metadata and CLI entry points
+- gallery generation and machine-readable summaries
+- documentation, CI, release workflows, and publishing workflows
 
-## What Was Corrected
+## Correctness And Numerical Fixes
 
-A few fixes mattered more than the rest:
+Several fixes were especially important:
 
 - unrestricted benchmark interpretation was corrected
-- the regularized dual was compared against the proper regularized primal quantity
-- the overflow-prone update in the regularized solver was replaced with a log-space implementation
-- convex-order feasibility became an explicit check rather than an implicit hope
+- the regularized dual was compared against the appropriate regularized primal quantity
+- the overflow-prone regularized update was replaced with a log-space implementation
+- convex-order feasibility became an explicit diagnostic rather than an implicit assumption
 
-## Why The Upgrade Matters
+## Effect Of The Upgrade
 
-The difference is not cosmetic. The package version makes it easier to:
+The package structure makes it easier to:
 
 - rerun experiments reproducibly
-- compare exact and regularized results honestly
-- inspect diagnostics instead of trusting notebook state
-- add new payoffs and gallery examples without re-threading old cells
-- publish the work in a form that survives beyond one machine and one afternoon
+- compare exact and regularized results systematically
+- inspect diagnostics rather than relying on notebook state
+- add new payoffs and gallery examples without restructuring earlier work
+- publish the project in a stable form suitable for reuse
 
-The notebook is still preserved as part of the story, but the library is now the source of truth. That is a better arrangement for both mathematics and memory.
+The legacy notebook remains part of the project history, but the library now serves as the source of truth.

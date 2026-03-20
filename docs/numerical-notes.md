@@ -1,111 +1,102 @@
 ﻿# Numerical Notes
 
-This is the page where I admit that numerical work has moods. The objective here is not to romanticize that fact, only to keep it visible.
+This page summarizes the numerical conventions used to interpret exact and regularized results in the package.
 {: .lead }
 
-## The Convex-Order Check Is The Bouncer
+## Convex-Order Check
 
-Before I solve anything, I run the discrete convex-order check.
+The discrete convex-order check is used before solving.
 
-Why I care:
+Its purpose is to verify that:
 
-- the means have to agree
-- discrete call-price inequalities have to go the right way
-- if those conditions fail, a martingale coupling is not supposed to exist
+- the means agree
+- discrete call-price inequalities have the correct sign
+- the pair of marginals is consistent with martingale feasibility
 
-In other words, the convex-order check keeps me from blaming the solver for refusing to solve an impossible problem.
+If this check fails, the problem should not be treated as admitting a martingale coupling.
 
-## How I Read `eps`
+## Interpretation Of `eps`
 
-Smaller `eps` usually means:
+Smaller `eps` typically implies:
 
 - less smoothing
 - a regularized expected payoff closer to the exact LP benchmark
 - more iterations
-- greater numerical stiffness
+- increased numerical stiffness
 
-Larger `eps` usually means:
+Larger `eps` typically implies:
 
 - easier convergence
 - smoother behavior
 - more bias relative to the exact objective
 
-I like regularization paths because they make this tradeoff visible instead of philosophical.
+Regularization paths make these tradeoffs explicit.
 
-## Why `expected_payoff` And `regularized_primal` Are Both Stored
+## `expected_payoff` Versus `regularized_primal`
 
-This is one of the details that is easy to blur in a notebook and worth keeping distinct in code.
+The package records both quantities because they are distinct:
 
 - `expected_payoff` is the raw expectation of the payoff under the regularized plan
-- `regularized_primal` is the objective that includes the entropy term
+- `regularized_primal` is the entropy-augmented objective
 
-Those are not interchangeable quantities. If I compare the wrong one to the dual, I can manufacture confusion very efficiently.
+These should not be compared interchangeably to dual quantities.
 
 ## Dual Gaps And Constraint Errors
 
-When I inspect `summary.json`, I look at four diagnostic families:
+The main diagnostic quantities in `summary.json` are:
 
 - dual gap
 - marginal-1 error
 - marginal-2 error
 - martingale error
 
-My rule of thumb is simple:
+Small values indicate stable numerical behavior and good constraint satisfaction. Larger values indicate that the run requires further inspection.
 
-- tiny errors mean the numerics are behaving
-- large errors mean I should stop admiring the plot and start debugging
+For example, the reference absolute-spread case at `eps = 0.1` has martingale error on the order of `1e-8`, which is consistent with a stable regularized run.
 
-The current gallery runs are in the healthy regime. For example, the reference absolute-spread case at `eps = 0.1` has martingale error on the order of `1e-8`, which is exactly the kind of number I want to see.
+## Small-`eps` Regime
 
-## The Small-`eps` Temptation
+Reducing `eps` moves the approximation closer to the LP benchmark, but also increases numerical difficulty. The package addresses part of this issue by carrying out the delicate update in log space rather than through a direct exponential form.
 
-The usual temptation is to push `eps` smaller and smaller until the approximation hugs the LP benchmark. Sometimes that works. Sometimes it just turns into a very expensive way to learn that floating-point arithmetic is not sentimental.
+Even with this modification, very small `eps` values should be interpreted with care.
 
-This repo already fixed one version of that story by moving the delicate update into log space. I prefer that approach to pretending overflow warnings are part of the scientific method.
+## Reading The Diagnostics Plot
 
-## Reading The Gallery Diagnostics
-
-The diagnostics plot has three panels:
+The diagnostics plot contains three panels:
 
 - absolute dual gap
 - martingale constraint error
 - iteration count
 
-I read them in exactly that order.
+These panels together summarize:
 
-Why:
+- whether primal and dual values are consistent
+- whether the defining martingale constraint is respected
+- the computational cost required to reach convergence
 
-- the dual gap tells me whether primal and dual stories agree
-- the martingale error tells me whether the defining constraint is being respected
-- the iteration count tells me what the approximation is costing me
+## Numerical Variation Across Examples
 
-If the first two are small, I can live with the third being larger. If the first two are ugly, a low iteration count is not a consolation prize.
+The gallery examples illustrate several different numerical regimes:
 
-## A Few Numerical Personalities In The Gallery
+- `uniform_abs_spread`: clear benchmark with visible regularization bias
+- `call_spread` and `put_spread`: narrower intervals suitable for directional comparison
+- `quadratic_spread`: nearly rigid interval in the current discretization
+- `centered_straddle`: wide interval under a symmetric geometric setup
+- `wide_abs`: increased second-marginal variance and a correspondingly wider robust interval
 
-The current examples have notably different behavior:
+## Limitations And Caution Points
 
-- `uniform_abs_spread`: clean benchmark, visible regularization bias, strong reference case
-- `call_spread` and `put_spread`: narrower intervals, good for directional comparisons
-- `quadratic_spread`: nearly rigid, which is almost funny after the more flexible examples
-- `centered_straddle`: wider interval and a good reminder that symmetry does not imply simplicity
-- `wide_abs`: larger variance in `S2`, larger robust interval, still numerically well-behaved
+The following issues should be kept in view:
 
-That range is useful because it keeps me from mistaking one problem's temperament for a law of nature.
+- very small `eps` values may be numerically stiff
+- coarse discretizations may give an oversimplified picture
+- visually appealing transport plans are not sufficient evidence of correctness
+- exactness here refers to the discrete LP, not directly to the underlying continuous problem
 
-## Known Sharp Edges
+## Practical Summary
 
-Things I still treat with appropriate caution:
+A consistent interpretation strategy is:
 
-- very small `eps` can become numerically stiff
-- coarse discretizations can tell an oversimplified story
-- a pretty plan plot is not proof of correctness by itself
-- exactness here is exactness for the discrete LP, not a direct proof about the underlying continuous problem
-
-Those are not defects so much as the terms of engagement.
-
-## My Practical Rule
-
-If I need one sentence to summarize my numerical attitude here, it is this:
-
-Use the LP to decide what is true in the discrete model, use the entropic solver to explore how that truth is approached, and keep the diagnostics close enough that optimism has to earn permission.
+- use the LP solution as the discrete benchmark
+- use the entropic solver to study the approximation path
+- keep diagnostics central to the interpretation of every run
