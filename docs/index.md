@@ -6,8 +6,8 @@ Public links:
 
 - PyPI: `https://pypi.org/project/mot-pricing/`
 - TestPyPI: `https://test.pypi.org/project/mot-pricing/`
-- Docs: `https://anouarmohamed.github.io/JavaFinalJee/`
-- Repository: `https://github.com/AnouarMohamed/JavaFinalJee`
+- Docs: `https://anouarmohamed.github.io/NoteBook/`
+- Repository: `https://github.com/AnouarMohamed/NoteBook`
 
 It started as a single notebook and is now a reproducible project with:
 

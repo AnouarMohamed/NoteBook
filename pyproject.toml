@@ -41,12 +41,12 @@ mot-uniform = "mot_pricing.cli:main"
 mot-gallery = "mot_pricing.gallery_cli:main"
 
 [project.urls]
-Homepage = "https://github.com/AnouarMohamed/JavaFinalJee"
-Repository = "https://github.com/AnouarMohamed/JavaFinalJee"
-Documentation = "https://anouarmohamed.github.io/JavaFinalJee/"
-Changelog = "https://github.com/AnouarMohamed/JavaFinalJee/blob/main/CHANGELOG.md"
-Issues = "https://github.com/AnouarMohamed/JavaFinalJee/issues"
-Releases = "https://github.com/AnouarMohamed/JavaFinalJee/releases"
+Homepage = "https://github.com/AnouarMohamed/NoteBook"
+Repository = "https://github.com/AnouarMohamed/NoteBook"
+Documentation = "https://anouarmohamed.github.io/NoteBook/"
+Changelog = "https://github.com/AnouarMohamed/NoteBook/blob/main/CHANGELOG.md"
+Issues = "https://github.com/AnouarMohamed/NoteBook/issues"
+Releases = "https://github.com/AnouarMohamed/NoteBook/releases"
 PyPI = "https://pypi.org/project/mot-pricing/"
 TestPyPI = "https://test.pypi.org/project/mot-pricing/"
 

@@ -35,8 +35,22 @@ For a different repository, the one-time setup is:
 Recommended mapping for this project:
 
 - owner: `AnouarMohamed`
-- repository: `JavaFinalJee`
+- repository: `NoteBook`
 - workflow: `publish-package.yml`
+- environment: `testpypi` or `pypi`
+
+If you rename the GitHub repository later, you must update the trusted publisher entry on PyPI and TestPyPI to match the new repository name, or publishes will fail.
+
+## Rename Troubleshooting
+
+If publishing starts failing right after a GitHub repository rename, check these exact values on both TestPyPI and PyPI trusted publisher settings:
+
+- owner: `AnouarMohamed`
+- repository: `NoteBook`
+- workflow: `publish-package.yml`
+- environment: `testpypi` for TestPyPI and `pypi` for PyPI
+
+Also update the local Git remote and any repository URLs in docs or package metadata so badges, docs links, and Pages URLs point at the renamed repository.
 
 ## How To Publish
 

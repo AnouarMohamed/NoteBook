@@ -1,7 +1,7 @@
 # MOT Pricing
 
-![CI](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/ci.yml/badge.svg)
-![Docs](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/docs.yml/badge.svg)
+![CI](https://github.com/AnouarMohamed/NoteBook/actions/workflows/ci.yml/badge.svg)
+![Docs](https://github.com/AnouarMohamed/NoteBook/actions/workflows/docs.yml/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/mot-pricing)
 ![Python](https://img.shields.io/pypi/pyversions/mot-pricing)
 
@@ -29,7 +29,7 @@ The codebase includes:
 
 ## Public Outputs
 
-- Docs site: `https://anouarmohamed.github.io/JavaFinalJee/`
+- Docs site: `https://anouarmohamed.github.io/NoteBook/`
 - GitHub releases: the tag workflow attaches wheel and source distribution assets
 - PyPI package: `https://pypi.org/project/mot-pricing/`
 - TestPyPI package: `https://test.pypi.org/project/mot-pricing/`

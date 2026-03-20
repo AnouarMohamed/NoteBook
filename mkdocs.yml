@@ -1,8 +1,8 @@
 site_name: MOT Pricing
 site_description: Robust pricing with martingale optimal transport
-site_url: https://anouarmohamed.github.io/JavaFinalJee/
-repo_url: https://github.com/AnouarMohamed/JavaFinalJee
-repo_name: AnouarMohamed/JavaFinalJee
+site_url: https://anouarmohamed.github.io/NoteBook/
+repo_url: https://github.com/AnouarMohamed/NoteBook
+repo_name: AnouarMohamed/NoteBook
 
 theme:
   name: material
