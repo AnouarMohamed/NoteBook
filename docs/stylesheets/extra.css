@@ -55,6 +55,24 @@
   margin: -0.1rem 0 1.4rem;
 }
 
+.md-typeset .casebook-table {
+  width: 42rem;
+  max-width: 100%;
+  margin: 1.15rem 0 1.6rem;
+}
+
+.md-typeset .casebook-table .md-typeset__table {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+.md-typeset .casebook-table table:not([class]) {
+  display: table !important;
+  width: 100% !important;
+  max-width: none;
+}
+
 .md-typeset__table {
   margin: 1.35rem 0 1.6rem;
 }
