@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mot-pricing"
-version = "0.3.1"
+version = "0.4.0"
 description = "Exact and entropic martingale optimal transport experiments for robust pricing."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,6 +38,7 @@ docs = [
 
 [project.scripts]
 mot-uniform = "mot_pricing.cli:main"
+mot-gallery = "mot_pricing.gallery_cli:main"
 
 [project.urls]
 Homepage = "https://github.com/AnouarMohamed/JavaFinalJee"

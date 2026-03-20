@@ -36,6 +36,12 @@ Custom spread call example:
 mot-uniform --n 60 --x-interval 1 3 --y-interval 0 4 --payoff call_on_spread --strike 0.25 --eps 0.3 0.1 --output-dir artifacts_call
 ```
 
+Curated gallery generation:
+
+```bash
+mot-gallery --output-dir gallery_artifacts
+```
+
 ## Python API
 
 ```python
@@ -51,6 +57,15 @@ experiment = run_two_uniform_experiment(
 
 print(experiment.exact_upper.value)
 print(experiment.convex_order.feasible)
+```
+
+For batch examples:
+
+```python
+from mot_pricing import builtin_gallery_specs, save_gallery_assets
+from pathlib import Path
+
+save_gallery_assets(Path("gallery_artifacts"), builtin_gallery_specs())
 ```
 
 ## Local Verification

@@ -80,3 +80,27 @@ Convenience wrapper for two-uniform experiments with configurable intervals and 
 ### `run_uniform_abs_spread_experiment(...)`
 
 Backward-compatible wrapper for the original notebook example.
+
+## Reporting And Gallery
+
+### `save_experiment_artifacts(...)`
+
+Writes the standard artifact set for a single experiment:
+
+- `exact_uniform_summary.png`
+- `regularization_path.png`
+- `stability_diagnostics.png`
+- `summary.json`
+
+### `builtin_gallery_specs()`
+
+Returns the curated example set used by the repository docs and gallery script.
+
+### `save_gallery_assets(...)`
+
+Runs the gallery specs and writes:
+
+- per-example artifact folders
+- `gallery_overview.png`
+- `gallery_summary.json`
+- `gallery_summary.md`

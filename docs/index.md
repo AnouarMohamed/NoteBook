@@ -15,6 +15,7 @@ It started as a single notebook and is now a reproducible project with:
 - entropy-regularized Sinkhorn-style solvers
 - convex-order feasibility diagnostics
 - a configurable CLI for two-uniform experiments
+- a gallery generator for curated multi-payoff showcases
 - tests, release workflows, and GitHub Pages documentation
 
 ## Core Problem
@@ -37,11 +38,13 @@ and optimizes an expected payoff such as:
 - It gives a regularized approximation that is faster and smoother to explore.
 - It makes martingale feasibility explicit through convex-order checks.
 - It turns exploratory research code into something reusable and testable.
+- It can now generate a compact gallery of example experiments with diagnostics and summaries.
 
 ## Project Highlights
 
 - Clean Python API in `src/mot_pricing/`
 - CLI entry point: `mot-uniform`
+- Gallery entry point: `mot-gallery`
 - Package-backed notebooks in `notebooks/`
 - Release assets built from tags
 - PyPI and TestPyPI publishing workflow

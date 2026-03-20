@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "uniform_abs_spread",
+    "title": "Uniform absolute spread",
+    "payoff_name": "abs_spread",
+    "strike": 0.0,
+    "exact_lower": 0.6087236358412826,
+    "exact_upper": 0.9975000000000005,
+    "width": 0.38877636415871786,
+    "smallest_eps": 0.1,
+    "smallest_eps_expected": 0.9538329430071653,
+    "smallest_eps_bias": -0.04366705699283524
+  },
+  {
+    "slug": "call_spread",
+    "title": "Call on spread",
+    "payoff_name": "call_on_spread",
+    "strike": 0.25,
+    "exact_lower": 0.1893757040485557,
+    "exact_upper": 0.3841029575892857,
+    "width": 0.19472725354073,
+    "smallest_eps": 0.1,
+    "smallest_eps_expected": 0.34685113914066157,
+    "smallest_eps_bias": -0.03725181844862413
+  },
+  {
+    "slug": "quadratic_spread",
+    "title": "Quadratic spread",
+    "payoff_name": "squared_distance",
+    "strike": 0.0,
+    "exact_lower": 0.9969135802469129,
+    "exact_upper": 0.9969135802469129,
+    "width": 0.0,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 0.9969136066968216,
+    "smallest_eps_bias": 2.644990870770414e-08
+  },
+  {
+    "slug": "centered_straddle",
+    "title": "Centered spread straddle",
+    "payoff_name": "straddle_on_spread",
+    "strike": 0.5,
+    "exact_lower": 0.6738937714427911,
+    "exact_upper": 1.089403255066835,
+    "width": 0.41550948362404405,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 1.0288876085809708,
+    "smallest_eps_bias": -0.06051564648586427
+  }
+]

@@ -2,7 +2,7 @@
 
 ## GitHub Releases
 
-Tag pushes like `v0.3.1` trigger the release workflow and attach the built wheel and source distribution to a GitHub release.
+Tag pushes like `v0.4.0` trigger the release workflow and attach the built wheel and source distribution to a GitHub release.
 
 ## PyPI Workflow
 

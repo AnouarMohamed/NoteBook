@@ -12,6 +12,7 @@ site/
 .ipynb_checkpoints/
 
 artifacts*/
+gallery_artifacts*/
 
 .DS_Store
 Thumbs.db

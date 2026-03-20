@@ -1,0 +1,62 @@
+{
+  "marginal_1": {
+    "name": "S1",
+    "size": 18,
+    "mean": -3.469446951953614e-17,
+    "variance": 0.33230452674897115
+  },
+  "marginal_2": {
+    "name": "S2",
+    "size": 18,
+    "mean": -6.938893903907228e-17,
+    "variance": 1.3292181069958846
+  },
+  "payoff": {
+    "name": "straddle_on_spread",
+    "description": "Spread straddle |(S2 - S1) - K|",
+    "strike": 0.5
+  },
+  "convex_order": {
+    "feasible": true,
+    "mean_gap": -3.469446951953614e-17,
+    "min_call_gap": 0.0,
+    "max_call_gap": 0.24999999999999992
+  },
+  "exact_upper": {
+    "value": 1.089403255066835,
+    "marginal_1_error": 1.3877787807814457e-17,
+    "marginal_2_error": 6.938893903907228e-17,
+    "martingale_error": 2.7755575615628914e-17
+  },
+  "exact_lower": {
+    "value": 0.6738937714427911,
+    "marginal_1_error": 6.938893903907228e-18,
+    "marginal_2_error": 2.7755575615628914e-17,
+    "martingale_error": 2.5587171270657905e-17
+  },
+  "benchmarks": null,
+  "regularized": {
+    "0.15": {
+      "expected_payoff": 1.0288876085809708,
+      "regularized_primal": 1.1144015228346484,
+      "dual_value": 1.1144015571798824,
+      "dual_gap": 3.434523399015177e-08,
+      "converged": true,
+      "iterations": 27,
+      "marginal_1_error": 2.9029460987817224e-09,
+      "marginal_2_error": 6.938893903907228e-17,
+      "martingale_error": 6.621263676231948e-09
+    },
+    "0.4": {
+      "expected_payoff": 0.9780777496072031,
+      "regularized_primal": 1.2926679383181536,
+      "dual_value": 1.2926678779062284,
+      "dual_gap": -6.04119252400892e-08,
+      "converged": true,
+      "iterations": 17,
+      "marginal_1_error": 3.714853896719106e-09,
+      "marginal_2_error": 4.85722573273506e-17,
+      "martingale_error": 9.606084726276887e-09
+    }
+  }
+}

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.4.0] - 2026-03-20
+
+### Added
+- reusable reporting helpers for experiment figures and diagnostics
+- a curated gallery system with built-in example specs and summary generation
+- a new `mot-gallery` CLI entry point and gallery generation script
+- stability diagnostics plots for regularized experiments
+- richer examples documentation with a cross-example gallery overview
+- tests for gallery and artifact generation
+
+### Changed
+- bumped package metadata from `0.3.1` to `0.4.0`
+- refactored the single-experiment CLI to reuse the shared reporting layer
+- expanded the README and docs to highlight the exploratory workflow
+
 ## [0.3.1] - 2026-03-20
 
 ### Added

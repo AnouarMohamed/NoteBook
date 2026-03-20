@@ -33,6 +33,7 @@ nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - Examples: examples.md
+  - Gallery Table: assets/gallery/gallery_summary.md
   - Upgrade Notes: upgrade_notes.md
   - API Guide: api.md
   - Publishing: publishing.md

@@ -20,9 +20,11 @@ The codebase includes:
 - a numerically stable entropic regularization solver
 - discrete marginal helpers plus convex-order checks
 - a built-in payoff library for spread-style payoffs
+- a curated gallery runner for multi-example experiment showcases
 - corrected unrestricted coupling benchmarks
 - a configurable CLI and script for custom uniform interval experiments
 - JSON summaries for reproducible experiment outputs
+- reusable reporting helpers for figures, diagnostics, and summaries
 - tests for the exact and regularized solvers
 
 ## Public Outputs
@@ -55,6 +57,12 @@ Then run the CLI:
 
 ```bash
 mot-uniform --n 50 --x-interval 1 3 --y-interval 0 4 --payoff abs_spread --eps 1.0 0.3 0.1 0.03 0.01 --output-dir artifacts
+```
+
+Generate the curated gallery:
+
+```bash
+mot-gallery --output-dir gallery_artifacts
 ```
 
 For editable local development:
@@ -101,6 +109,8 @@ For the broader API:
 - `DiscreteMarginal` represents weighted discrete laws
 - `check_convex_order_discrete(...)` provides a practical feasibility diagnostic
 - built-in payoffs include `abs_spread`, `squared_distance`, `call_on_spread`, `put_on_spread`, and `straddle_on_spread`
+- `save_experiment_artifacts(...)` writes figures and machine-readable summaries
+- `builtin_gallery_specs()` and `save_gallery_assets(...)` generate a mini research gallery
 
 ## Repo Layout
 
