@@ -64,9 +64,11 @@ The gallery therefore covers several qualitatively different regimes rather than
 
 - [Discrete Formulation](discrete-formulation.md): derivation of the discrete LP constraints and interpretation of the martingale rows
 - [Research Notes](research-notes.md): modeling scope and interpretation of exact versus regularized results
+- [Regularization Notes](regularization-notes.md): interpretation of regularized quantities, dual gaps, and the role of `eps`
 - [Numerical Notes](numerical-notes.md): diagnostics, small-`eps` behavior, and practical caution points
 - [Getting Started](getting-started.md): installation and first runs
 - [CLI Reference](cli-reference.md): command-line options and generated files
+- [Artifact Guide](artifact-guide.md): explanation of the figures, reports, and JSON files written by the package
 - [Examples](examples.md): gallery overview and selected comparisons
 - [Gallery Casebook](assets/gallery/gallery_casebook.md): longer generated notes for every built-in example
 - [API Guide](api.md): library entry points for scripting experiments
@@ -85,8 +87,9 @@ The gallery therefore covers several qualitatively different regimes rather than
 
 1. [Getting Started](getting-started.md)
 2. [CLI Reference](cli-reference.md)
-3. [Examples](examples.md)
-4. [Gallery Casebook](assets/gallery/gallery_casebook.md)
-5. [Numerical Notes](numerical-notes.md)
+3. [Artifact Guide](artifact-guide.md)
+4. [Examples](examples.md)
+5. [Gallery Casebook](assets/gallery/gallery_casebook.md)
+6. [Numerical Notes](numerical-notes.md)
 
 This sequence moves from execution to inspection to interpretation.

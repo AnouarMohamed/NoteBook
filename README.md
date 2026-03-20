@@ -138,8 +138,9 @@ print(experiment.exact_lower.value, experiment.exact_upper.value)
 The documentation site is available at `https://anouarmohamed.github.io/NoteBook/` and includes:
 
 - a discrete formulation page
-- research notes and numerical notes
+- research, regularization, and numerical notes
 - getting-started instructions and CLI reference
+- an artifact guide for generated files
 - a gallery overview and generated casebook
 - API notes and publishing guidance
 
