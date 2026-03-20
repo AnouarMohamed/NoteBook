@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mot-pricing"
-version = "0.3.0"
+version = "0.3.1"
 description = "Exact and entropic martingale optimal transport experiments for robust pricing."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,6 +29,7 @@ dependencies = [
 dev = [
   "build>=1.2",
   "pytest>=8.2",
+  "twine>=5.1",
 ]
 docs = [
   "mkdocs>=1.6,<2.0",
@@ -44,6 +45,9 @@ Repository = "https://github.com/AnouarMohamed/JavaFinalJee"
 Documentation = "https://anouarmohamed.github.io/JavaFinalJee/"
 Changelog = "https://github.com/AnouarMohamed/JavaFinalJee/blob/main/CHANGELOG.md"
 Issues = "https://github.com/AnouarMohamed/JavaFinalJee/issues"
+Releases = "https://github.com/AnouarMohamed/JavaFinalJee/releases"
+PyPI = "https://pypi.org/project/mot-pricing/"
+TestPyPI = "https://test.pypi.org/project/mot-pricing/"
 
 [tool.setuptools.package-dir]
 "" = "src"

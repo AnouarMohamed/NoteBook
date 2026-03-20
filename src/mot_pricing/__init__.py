@@ -20,7 +20,7 @@ from .marginals import (
 from .payoffs import PayoffSpec, builtin_payoff_names, make_builtin_payoff
 from .regularized import RegularizedMOTResult, sinkhorn_mot
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __all__ = [
     "__version__",

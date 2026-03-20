@@ -2,6 +2,13 @@
 
 `mot-pricing` is a small research-oriented Python package for robust pricing with martingale optimal transport.
 
+Public links:
+
+- PyPI: `https://pypi.org/project/mot-pricing/`
+- TestPyPI: `https://test.pypi.org/project/mot-pricing/`
+- Docs: `https://anouarmohamed.github.io/JavaFinalJee/`
+- Repository: `https://github.com/AnouarMohamed/JavaFinalJee`
+
 It started as a single notebook and is now a reproducible project with:
 
 - exact LP-based discrete MOT solvers
@@ -37,6 +44,7 @@ and optimizes an expected payoff such as:
 - CLI entry point: `mot-uniform`
 - Package-backed notebooks in `notebooks/`
 - Release assets built from tags
+- PyPI and TestPyPI publishing workflow
 - GitHub Pages docs built from this `docs/` directory
 
 ## Next Steps

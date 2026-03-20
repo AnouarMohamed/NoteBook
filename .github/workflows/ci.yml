@@ -32,5 +32,8 @@ jobs:
       - name: Build package
         run: python -m build
 
+      - name: Check built distributions
+        run: python -m twine check dist/*
+
       - name: Build docs
         run: mkdocs build --strict

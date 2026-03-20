@@ -2,6 +2,8 @@
 
 ![CI](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/ci.yml/badge.svg)
 ![Docs](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/docs.yml/badge.svg)
+![PyPI](https://img.shields.io/pypi/v/mot-pricing)
+![Python](https://img.shields.io/pypi/pyversions/mot-pricing)
 
 `mot-pricing` turns the original one-off notebook into a reproducible Python project for robust pricing with martingale optimal transport (MOT).
 
@@ -27,7 +29,9 @@ The codebase includes:
 
 - Docs site: `https://anouarmohamed.github.io/JavaFinalJee/`
 - GitHub releases: the tag workflow attaches wheel and source distribution assets
-- PyPI publishing workflow: prepared for trusted publishing once PyPI/TestPyPI are configured for this repo
+- PyPI package: `https://pypi.org/project/mot-pricing/`
+- TestPyPI package: `https://test.pypi.org/project/mot-pricing/`
+- Trusted publishing and GitHub Pages are active for this repository
 
 ## Why this repo exists
 
@@ -41,12 +45,25 @@ This project keeps the same experiment while packaging it into reusable, testabl
 
 ## Quick Start
 
+Install from PyPI:
+
+```bash
+pip install mot-pricing
+```
+
+Then run the CLI:
+
+```bash
+mot-uniform --n 50 --x-interval 1 3 --y-interval 0 4 --payoff abs_spread --eps 1.0 0.3 0.1 0.03 0.01 --output-dir artifacts
+```
+
+For editable local development:
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
 pip install -e .[dev]
 pytest
-mot-uniform --n 50 --x-interval 1 3 --y-interval 0 4 --payoff abs_spread --eps 1.0 0.3 0.1 0.03 0.01 --output-dir artifacts
 ```
 
 To build the docs locally:

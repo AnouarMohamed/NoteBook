@@ -2,6 +2,14 @@
 
 ## Installation
 
+From PyPI:
+
+```bash
+pip install mot-pricing
+```
+
+For local development:
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate

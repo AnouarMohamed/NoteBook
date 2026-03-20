@@ -21,6 +21,7 @@ pip install -e .[dev]
 ```bash
 pytest
 python -m build
+python -m twine check dist/*
 mkdocs build --strict
 python scripts/run_uniform_abs_spread.py --output-dir artifacts
 ```
@@ -30,7 +31,7 @@ python scripts/run_uniform_abs_spread.py --output-dir artifacts
 1. Update `CHANGELOG.md`.
 2. Bump the version in `pyproject.toml` and `src/mot_pricing/__init__.py`.
 3. Commit the release changes.
-4. Create an annotated tag such as `v0.3.0`.
+4. Create an annotated tag such as `v0.3.1`.
 5. Push the branch and tag.
 
 Pushing a `v*` tag triggers the GitHub release workflow, which builds the wheel and source distribution and attaches them to a GitHub release.

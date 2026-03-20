@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.3.1] - 2026-03-20
+
+### Added
+- PyPI and Python-version badges in the README
+- direct PyPI installation guidance in the README and docs
+- Twine validation for built distributions in CI and release workflows
+- additional public package and release links in project metadata
+
+### Changed
+- bumped package metadata from `0.3.0` to `0.3.1`
+- updated publishing docs to reflect that trusted publishing is already active for this repository
+- cleaned the docs landing page and release guidance
+
 ## [0.3.0] - 2026-03-20
 
 ### Added
