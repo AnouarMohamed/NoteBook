@@ -1,6 +1,7 @@
 # MOT Pricing
 
 ![CI](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/ci.yml/badge.svg)
+![Docs](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/docs.yml/badge.svg)
 
 `mot-pricing` turns the original one-off notebook into a reproducible Python project for robust pricing with martingale optimal transport (MOT).
 
@@ -22,6 +23,12 @@ The codebase includes:
 - JSON summaries for reproducible experiment outputs
 - tests for the exact and regularized solvers
 
+## Public Outputs
+
+- Docs site: `https://anouarmohamed.github.io/JavaFinalJee/`
+- GitHub releases: the tag workflow attaches wheel and source distribution assets
+- PyPI publishing workflow: prepared for trusted publishing once PyPI/TestPyPI are configured for this repo
+
 ## Why this repo exists
 
 The original notebook had strong ideas but mixed together derivation, experimentation, plotting, and solver logic. It also had a few correctness and presentation issues:
@@ -40,6 +47,13 @@ python -m venv .venv
 pip install -e .[dev]
 pytest
 mot-uniform --n 50 --x-interval 1 3 --y-interval 0 4 --payoff abs_spread --eps 1.0 0.3 0.1 0.03 0.01 --output-dir artifacts
+```
+
+To build the docs locally:
+
+```bash
+pip install -e .[docs]
+mkdocs serve
 ```
 
 If you prefer not to install the package in editable mode:
@@ -79,6 +93,7 @@ For the broader API:
 - `CHANGELOG.md`: release history
 - `CONTRIBUTING.md`: local development and release flow
 - `notebooks/`: notebook material preserved from the original exploration
+- `docs/`: GitHub Pages documentation source
 - `.github/workflows/`: CI for test automation
 
 ## Notebook Status

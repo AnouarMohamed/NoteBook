@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.3.0] - 2026-03-20
+
+### Added
+- MkDocs-based documentation site with examples, API notes, and publishing guidance
+- GitHub Pages deployment workflow for docs
+- manual trusted-publishing workflow for TestPyPI and PyPI
+- committed example gallery assets for the docs site
+- docs build verification in CI
+
+### Changed
+- bumped package metadata from `0.2.0` to `0.3.0`
+- expanded README and contributor guidance for public package and docs workflows
+
 ## [0.2.0] - 2026-03-20
 
 ### Added
