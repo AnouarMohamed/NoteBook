@@ -3,9 +3,23 @@
   --md-accent-fg-color: #ffb300;
 }
 
+.md-typeset .lead {
+  color: #32424a;
+  font-size: 1.16rem;
+  line-height: 1.75;
+  max-width: 54rem;
+}
+
 .md-typeset h1,
 .md-typeset h2 {
   letter-spacing: -0.02em;
+}
+
+.md-typeset blockquote {
+  background: rgba(255, 179, 0, 0.08);
+  border-left: 4px solid rgba(255, 179, 0, 0.9);
+  border-radius: 0 12px 12px 0;
+  padding: 0.9rem 1rem;
 }
 
 .md-typeset img {

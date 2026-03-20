@@ -1,0 +1,66 @@
+{
+  "marginal_1": {
+    "name": "S1",
+    "size": 18,
+    "mean": 1.0,
+    "variance": 0.33230452674897104
+  },
+  "marginal_2": {
+    "name": "S2",
+    "size": 18,
+    "mean": 1.0,
+    "variance": 2.07690329218107
+  },
+  "payoff": {
+    "name": "abs_spread",
+    "description": "Absolute spread |S2 - S1|",
+    "strike": 0.0
+  },
+  "convex_order": {
+    "feasible": true,
+    "mean_gap": 0.0,
+    "min_call_gap": 0.0,
+    "max_call_gap": 0.3750000000000001
+  },
+  "exact_upper": {
+    "value": 1.3100823045267491,
+    "marginal_1_error": 2.7755575615628914e-17,
+    "marginal_2_error": 2.7755575615628914e-17,
+    "martingale_error": 9.71445146547012e-17
+  },
+  "exact_lower": {
+    "value": 0.8753612143294685,
+    "marginal_1_error": 2.7755575615628914e-17,
+    "marginal_2_error": 6.938893903907228e-17,
+    "martingale_error": 1.9949319973733282e-17
+  },
+  "benchmarks": {
+    "unrestricted_min_comonotone": 0.7500000000187503,
+    "independent": 1.3166666679515544,
+    "unrestricted_max_countermonotone": 1.7500000000437506
+  },
+  "regularized": {
+    "0.15": {
+      "expected_payoff": 1.2486501512385084,
+      "regularized_primal": 1.3356488212811268,
+      "dual_value": 1.3356487918208306,
+      "dual_gap": -2.9460296202543645e-08,
+      "converged": true,
+      "iterations": 38,
+      "marginal_1_error": 9.934152320201228e-10,
+      "marginal_2_error": 9.020562075079397e-17,
+      "martingale_error": 6.730012366840121e-09
+    },
+    "0.4": {
+      "expected_payoff": 1.1898829099182027,
+      "regularized_primal": 1.5212307785357175,
+      "dual_value": 1.5212307541984198,
+      "dual_gap": -2.4337297732657248e-08,
+      "converged": true,
+      "iterations": 18,
+      "marginal_1_error": 6.109282316146825e-10,
+      "marginal_2_error": 4.85722573273506e-17,
+      "martingale_error": 4.895687980011054e-09
+    }
+  }
+}

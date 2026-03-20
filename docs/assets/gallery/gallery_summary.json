@@ -24,6 +24,18 @@
     "smallest_eps_bias": -0.03725181844862413
   },
   {
+    "slug": "put_spread",
+    "title": "Put on spread",
+    "payoff_name": "put_on_spread",
+    "strike": 0.25,
+    "exact_lower": 0.43937570404855497,
+    "exact_upper": 0.6341029575892857,
+    "width": 0.19472725354073073,
+    "smallest_eps": 0.1,
+    "smallest_eps_expected": 0.5968511498325995,
+    "smallest_eps_bias": -0.03725180775668624
+  },
+  {
     "slug": "quadratic_spread",
     "title": "Quadratic spread",
     "payoff_name": "squared_distance",
@@ -46,5 +58,29 @@
     "smallest_eps": 0.15,
     "smallest_eps_expected": 1.0288876085809708,
     "smallest_eps_bias": -0.06051564648586427
+  },
+  {
+    "slug": "centered_call",
+    "title": "Centered call on spread",
+    "payoff_name": "call_on_spread",
+    "strike": 0.5,
+    "exact_lower": 0.08694688572139553,
+    "exact_upper": 0.2947016275334176,
+    "width": 0.20775474181202208,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 0.2462428699881969,
+    "smallest_eps_bias": -0.04845875754522072
+  },
+  {
+    "slug": "wide_abs",
+    "title": "Wide absolute spread",
+    "payoff_name": "abs_spread",
+    "strike": 0.0,
+    "exact_lower": 0.8753612143294685,
+    "exact_upper": 1.3100823045267491,
+    "width": 0.43472109019728067,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 1.2486501512385084,
+    "smallest_eps_bias": -0.0614321532882407
   }
 ]
