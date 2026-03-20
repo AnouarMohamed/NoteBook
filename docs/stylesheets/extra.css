@@ -1,9 +1,14 @@
 :root {
   --md-primary-fg-color: #455a64;
   --md-accent-fg-color: #ffb300;
+
   --table-border: rgba(69, 90, 100, 0.14);
-  --table-header-bg: rgba(69, 90, 100, 0.08);
+  --table-header-bg: rgba(69, 90, 100, 0.06);
   --table-row-alt: rgba(69, 90, 100, 0.025);
+  --table-row-hover: rgba(69, 90, 100, 0.045);
+  --table-text: #24323a;
+  --table-bg: #ffffff;
+  --table-radius: 10px;
 }
 
 @media screen and (min-width: 76.25em) {
@@ -81,46 +86,77 @@
   border-radius: 0;
   box-shadow: none;
   background: transparent;
+  overflow-x: auto;
 }
 
 .md-typeset table {
+  width: 100% !important;
+  min-width: 420px;
+  display: table;
   border-collapse: separate;
   border-spacing: 0;
-  width: 100% !important;
-  display: table;
+  background: var(--table-bg);
+  color: var(--table-text);
   font-size: 0.92rem;
   line-height: 1.45;
   font-variant-numeric: tabular-nums;
+  border: 1px solid var(--table-border);
+  border-radius: var(--table-radius);
+  overflow: hidden;
 }
 
-.md-typeset table thead {
+.md-typeset table thead th {
   background: var(--table-header-bg);
+  color: var(--table-text);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-align: left;
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid var(--table-border);
 }
 
 .md-typeset table th,
 .md-typeset table td {
   padding: 0.8rem 0.95rem;
-  border-bottom: 1px solid var(--table-border);
-  border-top: 1px solid var(--table-border);
-  vertical-align: top;
+  vertical-align: middle;
+  border: 0;
 }
 
-.md-typeset table thead th {
-  color: #24323a;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+.md-typeset table tbody tr + tr td {
+  border-top: 1px solid var(--table-border);
 }
 
 .md-typeset table tbody tr:nth-child(even) {
   background: var(--table-row-alt);
 }
 
-.md-typeset table tbody tr:last-child td {
-  border-bottom: 0;
+.md-typeset table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
+.md-typeset table thead th:first-child {
+  border-top-left-radius: var(--table-radius);
+}
+
+.md-typeset table thead th:last-child {
+  border-top-right-radius: var(--table-radius);
+}
+
+.md-typeset table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--table-radius);
+}
+
+.md-typeset table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--table-radius);
 }
 
 .md-typeset table td code,
 .md-typeset table th code {
   font-size: 0.82rem;
+}
+
+.md-typeset .casebook-table--numeric th,
+.md-typeset .casebook-table--numeric td {
+  text-align: right !important;
 }

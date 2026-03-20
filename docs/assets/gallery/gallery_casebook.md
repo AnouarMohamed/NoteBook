@@ -16,20 +16,20 @@ The reference experiment: exact robust bounds for |S2 - S1|.
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.608724 | 0.997500 | 0.388776 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.1 | 0.953833 | -0.043667 |
 
 </div>
@@ -59,20 +59,20 @@ A directional payoff that emphasizes upside spread scenarios.
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.189376 | 0.384103 | 0.194727 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.1 | 0.346851 | -0.037252 |
 
 </div>
@@ -102,20 +102,20 @@ The directional sibling of the call, useful when downside spread moves matter mo
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.439376 | 0.634103 | 0.194727 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.1 | 0.596851 | -0.037252 |
 
 </div>
@@ -145,20 +145,20 @@ A variance-sensitive payoff that rewards larger deviations quadratically.
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.996914 | 0.996914 | 0.000000 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 0.996914 | +0.000000 |
 
 </div>
@@ -188,20 +188,20 @@ A symmetric payoff on a centered martingale system with wider second-step risk.
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.673894 | 1.089403 | 0.415509 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 1.028888 | -0.060516 |
 
 </div>
@@ -231,20 +231,20 @@ A centered setup where upward spread moves still matter, but the geometry is mor
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.086947 | 0.294702 | 0.207755 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 0.246243 | -0.048459 |
 
 </div>
@@ -274,20 +274,20 @@ The reference absolute-spread experiment with a noticeably wider second marginal
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.875361 | 1.310082 | 0.434721 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 1.248650 | -0.061432 |
 
 </div>
@@ -317,20 +317,20 @@ A downside-oriented payoff on the wider-marginal system, useful for comparison a
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.713319 | 0.938204 | 0.224885 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 0.886793 | -0.051411 |
 
 </div>
@@ -360,20 +360,20 @@ A straddle-style payoff on the original supports, highlighting symmetric sensiti
 
 ### Exact Results
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | Lower | Upper | Width |
-|---:|---:|---:|
+|---|---|---|
 | 0.621678 | 1.019361 | 0.397683 |
 
 </div>
 
 ### Smallest Regularization Level
 
-<div class="casebook-table" markdown="1">
+<div class="casebook-table casebook-table--numeric" markdown="1">
 
 | eps | Expected payoff | Bias to upper |
-|---:|---:|---:|
+|---|---|---|
 | 0.15 | 0.958709 | -0.060651 |
 
 </div>

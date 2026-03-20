@@ -252,10 +252,10 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
                 "",
                 "### Exact Results",
                 "",
-                '<div class="casebook-table" markdown="1">',
+                '<div class="casebook-table casebook-table--numeric" markdown="1">',
                 "",
                 "| Lower | Upper | Width |",
-                "|---:|---:|---:|",
+                "|---|---|---|",
                 (
                     f"| {entry.experiment.exact_lower.value:.6f} | "
                     f"{entry.experiment.exact_upper.value:.6f} | "
@@ -272,10 +272,10 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
                     "",
                     "### Smallest Regularization Level",
                     "",
-                    '<div class="casebook-table" markdown="1">',
+                    '<div class="casebook-table casebook-table--numeric" markdown="1">',
                     "",
                     "| eps | Expected payoff | Bias to upper |",
-                    "|---:|---:|---:|",
+                    "|---|---|---|",
                     f"| {smallest_eps:g} | {smallest_expected:.6f} | {smallest_bias:+.6f} |",
                     "",
                     "</div>",
