@@ -82,5 +82,29 @@
     "smallest_eps": 0.15,
     "smallest_eps_expected": 1.2486501512385084,
     "smallest_eps_bias": -0.0614321532882407
+  },
+  {
+    "slug": "wide_put",
+    "title": "Wide put on spread",
+    "payoff_name": "put_on_spread",
+    "strike": 0.5,
+    "exact_lower": 0.7133185937005379,
+    "exact_upper": 0.9382040065558584,
+    "width": 0.2248854128553206,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 0.8867926128181444,
+    "smallest_eps_bias": -0.051411393737714084
+  },
+  {
+    "slug": "broad_straddle",
+    "title": "Broad spread straddle",
+    "payoff_name": "straddle_on_spread",
+    "strike": 0.25,
+    "exact_lower": 0.6216780947105024,
+    "exact_upper": 1.019360603388381,
+    "width": 0.3976825086778787,
+    "smallest_eps": 0.15,
+    "smallest_eps_expected": 0.9587093376928543,
+    "smallest_eps_bias": -0.06065126569552681
   }
 ]

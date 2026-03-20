@@ -1,13 +1,15 @@
 ﻿# Examples
 
-This page summarizes the shipped gallery examples and highlights the main numerical patterns in each case.
+This page summarizes the built-in gallery and highlights the principal numerical patterns across the current experiment set.
 {: .lead }
 
 ## Gallery Overview
 
-The built-in gallery currently contains seven examples covering directional payoffs, symmetric payoffs, wider marginals, and a quadratic case with a nearly degenerate interval.
+The built-in gallery currently contains nine examples. These include directional payoffs, symmetric payoffs, widened marginals, and a quadratic case whose interval nearly collapses in the present discretization.
 
 ![Gallery overview](assets/gallery/gallery_overview.png)
+
+Long-form generated notes are available in the [Gallery Casebook](assets/gallery/gallery_casebook.md).
 
 ## Summary Table
 
@@ -20,168 +22,113 @@ The built-in gallery currently contains seven examples covering directional payo
 | Centered spread straddle | 0.6739 | 1.0894 | 0.4155 | 1.0289 |
 | Centered call on spread | 0.0869 | 0.2947 | 0.2078 | 0.2462 |
 | Wide absolute spread | 0.8754 | 1.3101 | 0.4347 | 1.2487 |
+| Wide put on spread | 0.7133 | 0.9382 | 0.2249 | 0.8868 |
+| Broad spread straddle | 0.6217 | 1.0194 | 0.3977 | 0.9587 |
 
 Machine-readable summary files:
 
 - [`docs/assets/gallery/gallery_summary.md`](assets/gallery/gallery_summary.md)
 - [`docs/assets/gallery/gallery_summary.json`](assets/gallery/gallery_summary.json)
 
-## Interpretation Framework
+## Reading Conventions
 
-The examples are read using the following conventions:
+The examples are interpreted according to the following conventions:
 
-- the exact LP bounds are treated as the benchmark
-- interval width is interpreted as a measure of residual model uncertainty under the martingale constraint
-- the smallest shipped `eps` value is treated as an approximation diagnostic rather than as a replacement for the LP value
-- diagnostic plots are used to assess convergence quality and constraint satisfaction
+- the exact LP bounds are the benchmark
+- interval width is used as a measure of residual model uncertainty under the martingale restriction
+- the smallest shipped `eps` value is treated as an approximation diagnostic rather than as a substitute for the LP benchmark
+- structural diagnostics and convergence diagnostics are used together
 
-## Uniform Absolute Spread
+## Selected Comparisons
 
-Reference problem:
+### Reference Absolute Spread
 
 - `S1 ~ Uniform[1, 3]`
 - `S2 ~ Uniform[0, 4]`
 - payoff `|S2 - S1|`
+- exact interval `[0.6087, 0.9975]`
 
-Key values:
-
-- lower bound `0.6087`
-- upper bound `0.9975`
-- interval width `0.3888`
-- smallest shipped `eps = 0.1` gives expected payoff `0.9538`
-
-This is the baseline case in which the martingale constraint still permits a substantial interval. The unrestricted upper benchmark remains materially larger, indicating that the martingale restriction has a significant effect.
+This remains the baseline experiment for the repository. The interval is substantial, and the unrestricted countermonotone benchmark is materially larger than the exact martingale upper value.
 
 ![Uniform abs spread exact summary](assets/gallery/uniform_abs_spread/exact_uniform_summary.png)
 
-Reference files:
+![Uniform abs spread structural diagnostics](assets/gallery/uniform_abs_spread/structural_diagnostics.png)
 
-- [`docs/assets/gallery/uniform_abs_spread/summary.json`](assets/gallery/uniform_abs_spread/summary.json)
-- [`docs/assets/gallery/uniform_abs_spread/regularization_path.png`](assets/gallery/uniform_abs_spread/regularization_path.png)
-- [`docs/assets/gallery/uniform_abs_spread/stability_diagnostics.png`](assets/gallery/uniform_abs_spread/stability_diagnostics.png)
+### Directional Spread Comparison
 
-## Call On Spread
+The call-on-spread and put-on-spread examples provide a useful directional comparison on the same support pair.
 
-- payoff `max(S2 - S1 - 0.25, 0)`
-- lower bound `0.1894`
-- upper bound `0.3841`
-- interval width `0.1947`
+- call on spread: interval `[0.1894, 0.3841]`
+- put on spread: interval `[0.4394, 0.6341]`
 
-Relative to the absolute-spread reference case, this interval is narrower. The payoff emphasizes one directional tail and therefore reduces the range of admissible values under the martingale constraint.
+The widths coincide in the current discretization, but the interval levels differ. This separates directional asymmetry from overall interval scale.
 
 ![Call spread exact summary](assets/gallery/call_spread/exact_uniform_summary.png)
 
-Reference file:
-
-- [`docs/assets/gallery/call_spread/summary.json`](assets/gallery/call_spread/summary.json)
-
-## Put On Spread
-
-- payoff `max(0.25 - (S2 - S1), 0)`
-- lower bound `0.4394`
-- upper bound `0.6341`
-- interval width `0.1947`
-
-This example has the same width as the call-on-spread case but a higher interval level. It is useful for comparing directional asymmetry while holding the general setup fixed.
-
 ![Put spread exact summary](assets/gallery/put_spread/exact_uniform_summary.png)
 
-Reference file:
+### Centered Symmetric System
 
-- [`docs/assets/gallery/put_spread/summary.json`](assets/gallery/put_spread/summary.json)
+The centered straddle and centered call examples move to `S1 ~ Uniform[-1, 1]` and `S2 ~ Uniform[-2, 2]`.
 
-## Quadratic Spread
+- centered straddle: interval `[0.6739, 1.0894]`
+- centered call: interval `[0.0869, 0.2947]`
 
-- payoff `(S2 - S1)^2`
-- lower bound `0.9969`
-- upper bound `0.9969`
-- interval width `0.0000`
-
-In the current discrete setting, the robust interval collapses numerically. This example illustrates that some payoffs are substantially more rigid than the spread-option cases.
-
-![Quadratic spread exact summary](assets/gallery/quadratic_spread/exact_uniform_summary.png)
-
-Reference file:
-
-- [`docs/assets/gallery/quadratic_spread/summary.json`](assets/gallery/quadratic_spread/summary.json)
-
-## Centered Spread Straddle
-
-- `S1 ~ Uniform[-1, 1]`
-- `S2 ~ Uniform[-2, 2]`
-- payoff `|(S2 - S1) - 0.5|`
-- lower bound `0.6739`
-- upper bound `1.0894`
-
-This example produces one of the widest intervals in the gallery. It is useful for studying a symmetric geometric setup with a nontrivial robust range.
+These examples are useful when geometric symmetry is desirable without eliminating nontrivial pricing intervals.
 
 ![Centered straddle exact summary](assets/gallery/centered_straddle/exact_uniform_summary.png)
 
-Reference files:
-
-- [`docs/assets/gallery/centered_straddle/summary.json`](assets/gallery/centered_straddle/summary.json)
-- [`docs/assets/gallery/centered_straddle/regularization_path.png`](assets/gallery/centered_straddle/regularization_path.png)
-
-## Centered Call On Spread
-
-- payoff `max(S2 - S1 - 0.5, 0)`
-- lower bound `0.0869`
-- upper bound `0.2947`
-- interval width `0.2078`
-
-This example shows that a centered geometry can still produce a meaningful robust interval for a directional payoff.
-
 ![Centered call exact summary](assets/gallery/centered_call/exact_uniform_summary.png)
 
-Reference file:
+### Wider-Marginal Regime
 
-- [`docs/assets/gallery/centered_call/summary.json`](assets/gallery/centered_call/summary.json)
+The wide absolute-spread and wide put-on-spread examples increase the variance of the second marginal.
 
-## Wide Absolute Spread
+- wide absolute spread: interval `[0.8754, 1.3101]`
+- wide put on spread: interval `[0.7133, 0.9382]`
 
-- `S1 ~ Uniform[0, 2]`
-- `S2 ~ Uniform[-1.5, 3.5]`
-- payoff `|S2 - S1|`
-- lower bound `0.8754`
-- upper bound `1.3101`
-- interval width `0.4347`
-
-Increasing the dispersion of the second marginal widens the robust interval and raises the upper bound. This example serves as a useful stress test while remaining numerically stable.
+These examples show how increased dispersion in the second marginal broadens or shifts the robust pricing range.
 
 ![Wide abs exact summary](assets/gallery/wide_abs/exact_uniform_summary.png)
 
-Reference files:
+![Wide put exact summary](assets/gallery/wide_put/exact_uniform_summary.png)
 
-- [`docs/assets/gallery/wide_abs/summary.json`](assets/gallery/wide_abs/summary.json)
-- [`docs/assets/gallery/wide_abs/regularization_path.png`](assets/gallery/wide_abs/regularization_path.png)
+### Broad Straddle
 
-## Regularization Diagnostics
+The broad spread straddle retains the original support pair but changes the payoff to `|(S2 - S1) - 0.25|`.
 
-The following plots are particularly useful for assessing regularized behavior.
+- lower bound `0.6217`
+- upper bound `1.0194`
+- interval width `0.3977`
 
-### Uniform Absolute Spread Path
+This example complements the original absolute-spread benchmark by introducing a symmetric payoff around a nonzero strike.
 
-![Uniform abs spread regularization path](assets/gallery/uniform_abs_spread/regularization_path.png)
+![Broad straddle exact summary](assets/gallery/broad_straddle/exact_uniform_summary.png)
 
-### Uniform Absolute Spread Diagnostics
+## Diagnostic Figures
 
-![Uniform abs spread diagnostics](assets/gallery/uniform_abs_spread/stability_diagnostics.png)
+Two diagnostic families are particularly useful in practice.
 
-### Wide Absolute Spread Path
+### Regularization Paths
 
-![Wide abs regularization path](assets/gallery/wide_abs/regularization_path.png)
+- [`uniform_abs_spread/regularization_path.png`](assets/gallery/uniform_abs_spread/regularization_path.png)
+- [`wide_abs/regularization_path.png`](assets/gallery/wide_abs/regularization_path.png)
+- [`broad_straddle/regularization_path.png`](assets/gallery/broad_straddle/regularization_path.png)
 
-### Centered Straddle Diagnostics
+### Structural Diagnostics
 
-![Centered straddle diagnostics](assets/gallery/centered_straddle/stability_diagnostics.png)
+- [`uniform_abs_spread/structural_diagnostics.png`](assets/gallery/uniform_abs_spread/structural_diagnostics.png)
+- [`centered_straddle/structural_diagnostics.png`](assets/gallery/centered_straddle/structural_diagnostics.png)
+- [`wide_put/structural_diagnostics.png`](assets/gallery/wide_put/structural_diagnostics.png)
 
-Across the gallery, the main pattern is consistent:
+The structural diagnostics combine marginal profiles, conditional dispersion, and convex-order call gaps in a single figure.
 
-- expected payoff approaches the LP upper value as `eps` decreases
-- smaller `eps` values require more iterations
-- constraint errors remain small in stable runs
-- the entropic objective differs from the raw expected payoff and should be interpreted separately
+## Per-Example Reports
 
-## Concluding Remark
+Each example directory now includes:
 
-The gallery is intended to show several qualitatively different forms of uncertainty within a compact set of reproducible examples.
+- `experiment_report.md`
+- `summary.json`
+- exact, regularization, stability, and structural plots
+
+These files are linked from the generated [Gallery Casebook](assets/gallery/gallery_casebook.md).

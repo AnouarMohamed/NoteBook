@@ -8,6 +8,18 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .marginals import call_prices
+
+
+def _conditional_std_from_plan(plan: np.ndarray, y_atoms: np.ndarray) -> np.ndarray:
+    row_totals = plan.sum(axis=1)
+    safe_totals = np.where(row_totals > 0.0, row_totals, 1.0)
+    conditional_mean = (plan @ y_atoms) / safe_totals
+    conditional_second = (plan @ (y_atoms**2)) / safe_totals
+    variance = np.maximum(conditional_second - conditional_mean**2, 0.0)
+    conditional_std = np.sqrt(variance)
+    return np.where(row_totals > 0.0, conditional_std, np.nan)
+
 
 def save_exact_summary_plot(output_dir: Path, experiment) -> None:
     """Save the exact plan summary plot for a single experiment."""
@@ -178,6 +190,89 @@ def save_stability_diagnostics_plot(output_dir: Path, experiment) -> None:
     plt.close(figure)
 
 
+def save_structural_diagnostics_plot(output_dir: Path, experiment) -> None:
+    """Save plots that describe marginals, conditional dispersion, and convex order."""
+    figure, axes = plt.subplots(1, 3, figsize=(16, 4.5))
+
+    axes[0].plot(
+        experiment.marginal_1.atoms,
+        experiment.marginal_1.weights,
+        "o-",
+        linewidth=2,
+        color="#3182bd",
+        label=experiment.marginal_1.name or "marginal 1",
+    )
+    axes[0].plot(
+        experiment.marginal_2.atoms,
+        experiment.marginal_2.weights,
+        "s-",
+        linewidth=2,
+        color="#e6550d",
+        label=experiment.marginal_2.name or "marginal 2",
+    )
+    axes[0].set_title("Discrete marginals")
+    axes[0].set_xlabel("atom")
+    axes[0].set_ylabel("weight")
+    axes[0].grid(alpha=0.3)
+    axes[0].legend()
+
+    x_atoms = experiment.marginal_1.atoms
+    y_atoms = experiment.marginal_2.atoms
+    axes[1].plot(
+        x_atoms,
+        _conditional_std_from_plan(experiment.exact_lower.plan, y_atoms),
+        "o-",
+        linewidth=2,
+        color="#8c6d31",
+        label="exact lower",
+    )
+    axes[1].plot(
+        x_atoms,
+        _conditional_std_from_plan(experiment.exact_upper.plan, y_atoms),
+        "o-",
+        linewidth=2,
+        color="#756bb1",
+        label="exact upper",
+    )
+    if experiment.regularized_results:
+        smallest_eps = min(experiment.regularized_results)
+        axes[1].plot(
+            x_atoms,
+            _conditional_std_from_plan(
+                experiment.regularized_results[smallest_eps].plan,
+                y_atoms,
+            ),
+            "o--",
+            linewidth=1.8,
+            color="#31a354",
+            label=f"regularized eps={smallest_eps:g}",
+        )
+    axes[1].set_title("Conditional standard deviation")
+    axes[1].set_xlabel("s1")
+    axes[1].set_ylabel("std[S2 | S1 = s1]")
+    axes[1].grid(alpha=0.3)
+    axes[1].legend(fontsize=8)
+
+    call_gap = call_prices(experiment.marginal_2, experiment.convex_order.strikes) - call_prices(
+        experiment.marginal_1, experiment.convex_order.strikes
+    )
+    axes[2].plot(
+        experiment.convex_order.strikes,
+        call_gap,
+        linewidth=2,
+        color="#dd1c77",
+    )
+    axes[2].axhline(0.0, color="black", linestyle="--", linewidth=1.0)
+    axes[2].set_title("Convex-order call gap")
+    axes[2].set_xlabel("strike")
+    axes[2].set_ylabel("C_mu2(K) - C_mu1(K)")
+    axes[2].grid(alpha=0.3)
+
+    figure.tight_layout()
+    figure.savefig(output_dir / "structural_diagnostics.png", bbox_inches="tight")
+    plt.close(figure)
+
+
 def write_summary_json(output_dir: Path, experiment) -> None:
     """Write a machine-readable experiment summary."""
     benchmarks = None
@@ -249,10 +344,117 @@ def write_summary_json(output_dir: Path, experiment) -> None:
     )
 
 
+def write_experiment_markdown(output_dir: Path, experiment) -> None:
+    """Write a compact markdown report for a single experiment."""
+    lines = [
+        f"# Experiment Report: {experiment.payoff.description}",
+        "",
+        "## Setup",
+        "",
+        f"- marginal 1: `{experiment.marginal_1.name or 'S1'}` with support size `{experiment.marginal_1.size}`",
+        f"- marginal 2: `{experiment.marginal_2.name or 'S2'}` with support size `{experiment.marginal_2.size}`",
+        f"- payoff: `{experiment.payoff.name}`",
+        f"- strike: `{experiment.payoff.strike:.6f}`",
+        "",
+        "## Marginal Moments",
+        "",
+        "| Marginal | Mean | Variance |",
+        "|---|---:|---:|",
+        (
+            f"| `{experiment.marginal_1.name or 'S1'}` | {experiment.marginal_1.mean:.6f} | "
+            f"{experiment.marginal_1.variance:.6f} |"
+        ),
+        (
+            f"| `{experiment.marginal_2.name or 'S2'}` | {experiment.marginal_2.mean:.6f} | "
+            f"{experiment.marginal_2.variance:.6f} |"
+        ),
+        "",
+        "## Exact Bounds",
+        "",
+        "| Objective | Value | Marginal-1 error | Marginal-2 error | Martingale error |",
+        "|---|---:|---:|---:|---:|",
+        (
+            f"| lower | {experiment.exact_lower.value:.6f} | "
+            f"{experiment.exact_lower.marginal_1_error:.2e} | "
+            f"{experiment.exact_lower.marginal_2_error:.2e} | "
+            f"{experiment.exact_lower.martingale_error:.2e} |"
+        ),
+        (
+            f"| upper | {experiment.exact_upper.value:.6f} | "
+            f"{experiment.exact_upper.marginal_1_error:.2e} | "
+            f"{experiment.exact_upper.marginal_2_error:.2e} | "
+            f"{experiment.exact_upper.martingale_error:.2e} |"
+        ),
+        "",
+        "## Convex-Order Diagnostic",
+        "",
+        f"- feasible: `{experiment.convex_order.feasible}`",
+        f"- mean gap: `{experiment.convex_order.mean_gap:.2e}`",
+        f"- minimum call gap: `{experiment.convex_order.min_call_gap:.2e}`",
+        f"- maximum call gap: `{experiment.convex_order.max_call_gap:.2e}`",
+    ]
+
+    if experiment.unrestricted_benchmarks is not None:
+        lines.extend(
+            [
+                "",
+                "## Unrestricted Benchmarks",
+                "",
+                "| Benchmark | Value |",
+                "|---|---:|",
+                (
+                    f"| comonotone minimum | "
+                    f"{experiment.unrestricted_benchmarks.unrestricted_min_comonotone:.6f} |"
+                ),
+                f"| independent | {experiment.unrestricted_benchmarks.independent:.6f} |",
+                (
+                    f"| countermonotone maximum | "
+                    f"{experiment.unrestricted_benchmarks.unrestricted_max_countermonotone:.6f} |"
+                ),
+            ]
+        )
+
+    if experiment.regularized_results:
+        lines.extend(
+            [
+                "",
+                "## Regularized Runs",
+                "",
+                "| eps | Expected payoff | Regularized primal | Dual gap | Iterations | Converged |",
+                "|---:|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for eps, result in sorted(experiment.regularized_results.items()):
+            lines.append(
+                f"| {eps:g} | {result.expected_payoff:.6f} | {result.regularized_primal:.6f} | "
+                f"{result.dual_gap:+.2e} | {result.iterations} | {result.converged} |"
+            )
+
+    lines.extend(
+        [
+            "",
+            "## Artifact Files",
+            "",
+            "- `exact_uniform_summary.png`",
+            "- `regularization_path.png`",
+            "- `stability_diagnostics.png`",
+            "- `structural_diagnostics.png`",
+            "- `summary.json`",
+        ]
+    )
+
+    (output_dir / "experiment_report.md").write_text(
+        "\n".join(lines) + "\n",
+        encoding="utf-8",
+    )
+
+
 def save_experiment_artifacts(output_dir: Path, experiment) -> None:
     """Save all standard artifacts for a single experiment."""
     output_dir.mkdir(parents=True, exist_ok=True)
     save_exact_summary_plot(output_dir, experiment)
     save_regularization_path_plot(output_dir, experiment)
     save_stability_diagnostics_plot(output_dir, experiment)
+    save_structural_diagnostics_plot(output_dir, experiment)
     write_summary_json(output_dir, experiment)
+    write_experiment_markdown(output_dir, experiment)

@@ -41,18 +41,29 @@ The package records both quantities because they are distinct:
 
 These should not be compared interchangeably to dual quantities.
 
-## Dual Gaps And Constraint Errors
+## Main Diagnostic Quantities
 
-The main diagnostic quantities in `summary.json` are:
+The principal diagnostic quantities in `summary.json` are:
 
 - dual gap
 - marginal-1 error
 - marginal-2 error
 - martingale error
+- iteration count
 
 Small values indicate stable numerical behavior and good constraint satisfaction. Larger values indicate that the run requires further inspection.
 
 For example, the reference absolute-spread case at `eps = 0.1` has martingale error on the order of `1e-8`, which is consistent with a stable regularized run.
+
+## Structural Diagnostics
+
+Each experiment now includes a `structural_diagnostics.png` figure with three complementary views:
+
+- the discrete marginals themselves
+- conditional standard deviation profiles implied by the exact and regularized plans
+- the convex-order call-price gap over the strike grid
+
+This figure is useful because it combines feasibility information, conditional dispersion, and support geometry in one place.
 
 ## Small-`eps` Regime
 
@@ -62,13 +73,13 @@ Even with this modification, very small `eps` values should be interpreted with 
 
 ## Reading The Diagnostics Plot
 
-The diagnostics plot contains three panels:
+The stability diagnostics plot contains three panels:
 
 - absolute dual gap
 - martingale constraint error
 - iteration count
 
-These panels together summarize:
+These panels summarize:
 
 - whether primal and dual values are consistent
 - whether the defining martingale constraint is respected
@@ -82,7 +93,8 @@ The gallery examples illustrate several different numerical regimes:
 - `call_spread` and `put_spread`: narrower intervals suitable for directional comparison
 - `quadratic_spread`: nearly rigid interval in the current discretization
 - `centered_straddle`: wide interval under a symmetric geometric setup
-- `wide_abs`: increased second-marginal variance and a correspondingly wider robust interval
+- `wide_abs` and `wide_put`: increased second-marginal variance and broader intervals
+- `broad_straddle`: symmetric payoff sensitivity around a nonzero strike
 
 ## Limitations And Caution Points
 
@@ -99,4 +111,4 @@ A consistent interpretation strategy is:
 
 - use the LP solution as the discrete benchmark
 - use the entropic solver to study the approximation path
-- keep diagnostics central to the interpretation of every run
+- keep both stability diagnostics and structural diagnostics central to interpretation

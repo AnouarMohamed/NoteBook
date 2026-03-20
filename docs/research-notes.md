@@ -31,7 +31,7 @@ subject to             sum_j pi_ij = mu_i
                        pi_ij >= 0
 ```
 
-This formulation makes the marginals, the martingale restriction, and the objective explicit.
+A longer discussion of the discrete construction is provided in [Discrete Formulation](discrete-formulation.md).
 
 ## Entropic Regularization
 
@@ -53,7 +53,8 @@ Several recurring patterns are visible in the shipped examples:
 - The call-on-spread and put-on-spread examples have the same width in the current discretization but different interval levels.
 - The centered straddle produces one of the widest intervals in the gallery.
 - The quadratic spread nearly collapses to a single value in the current discrete setting.
-- Increasing the variance of the second marginal widens the robust interval in the absolute-spread example.
+- Increasing the variance of the second marginal widens the robust interval in the absolute-spread and put-on-spread wide examples.
+- A broad spread straddle on the original support pair remains highly nontrivial despite its symmetry.
 
 ## Conditions For Confidence
 

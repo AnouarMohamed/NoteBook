@@ -1,6 +1,6 @@
 ﻿# MOT Pricing
 
-`mot-pricing` is a small research-oriented package for robust pricing under martingale optimal transport constraints. It grew out of a single exploratory notebook and is now organized as a reproducible library with exact solvers, regularized solvers, reporting utilities, and a documented experiment gallery.
+`mot-pricing` is a compact research-oriented package for robust pricing with martingale optimal transport. The repository combines exact discrete linear-programming solvers, entropy-regularized approximations, reporting utilities, and a gallery of reproducible examples.
 {: .lead }
 
 Public links:
@@ -12,72 +12,81 @@ Public links:
 
 ## Core Problem
 
-The package studies couplings `P` such that:
+The package studies couplings `P` satisfying:
 
 - `S1 ~ mu1`
 - `S2 ~ mu2`
 - `E[S2 | S1] = S1`
 
-and optimizes `E_P[payoff(S1, S2)]` over all such couplings.
+and computes extremal values of `E_P[payoff(S1, S2)]` under this martingale restriction.
 
-In discrete form, the associated linear program is:
+In discrete form, the associated optimization problem is a linear program over a coupling matrix `Pi = (pi_ij)`.
 
-```text
-maximize or minimize   sum_{i,j} pi_ij c(x_i, y_j)
-subject to             sum_j pi_ij = mu_i
-                       sum_i pi_ij = nu_j
-                       sum_j pi_ij (y_j - x_i) = 0    for each i
-                       pi_ij >= 0
-```
+## Main Components
 
-This formulation makes the marginal constraints, martingale restrictions, and payoff functional explicit.
+The repository contains four closely connected layers.
 
-## Current Gallery Summary
+### Exact Optimization
 
-The built-in gallery currently includes seven examples with distinct numerical characteristics:
+The exact solver computes the discrete benchmark by solving the full martingale OT linear program.
 
-- The reference `|S2 - S1|` experiment has discrete bounds `0.6087` and `0.9975`.
-- The call-on-spread example has bounds `0.1894` and `0.3841`.
-- The put-on-spread example has bounds `0.4394` and `0.6341`.
-- The centered spread straddle has interval width approximately `0.4155`.
-- The wide absolute-spread example raises the upper bound to `1.3101`.
-- The quadratic spread example collapses numerically to a nearly degenerate interval.
+### Regularized Approximation
 
-Taken together, these examples illustrate directional, symmetric, and variance-sensitive payoff structures.
+The regularized solver computes entropy-penalized approximations across a grid of `eps` values and records convergence diagnostics.
 
-## Why The Package Exists
+### Reporting
 
-The original notebook combined derivation, experimentation, plotting, and solver logic in a single environment. The package version separates these concerns and addresses several issues from the notebook stage:
+Each experiment can produce a standard artifact set consisting of:
 
-- unrestricted coupling benchmarks are labeled correctly
-- the regularized dual is compared against the regularized primal rather than raw `E[payoff]`
-- the regularized update is handled in log space for improved numerical stability
-- convex-order feasibility is checked explicitly before solving
-- experiments produce plots and machine-readable summaries as standard artifacts
+- summary figures for exact and regularized behavior
+- structural diagnostics plots
+- machine-readable JSON summaries
+- markdown experiment reports
 
-## Documentation Structure
+### Gallery
 
-- [Research Notes](research-notes.md): modeling assumptions and interpretation of exact versus regularized results
-- [Numerical Notes](numerical-notes.md): diagnostics, convergence behavior, and practical numerical considerations
-- [Getting Started](getting-started.md): installation, CLI usage, and artifact generation
-- [Examples](examples.md): the experiment gallery with numerical summaries and interpretation
-- [API Guide](api.md): principal public entry points for scripting and analysis
-- [Upgrade Notes](upgrade_notes.md): transition from notebook to package
-- [Publishing](publishing.md): release and trusted-publisher configuration notes
+The gallery provides a curated collection of built-in experiments for cross-example comparison and documentation.
+
+## Current Gallery Scope
+
+The shipped gallery currently contains nine examples spanning:
+
+- absolute-spread benchmarks
+- call and put spread payoffs
+- straddle-type payoffs
+- centered systems
+- wider second marginals
+- a quadratic example with a nearly degenerate interval
+
+The gallery therefore covers several qualitatively different regimes rather than a single canned demonstration.
+
+## Documentation Map
+
+- [Discrete Formulation](discrete-formulation.md): derivation of the discrete LP constraints and interpretation of the martingale rows
+- [Research Notes](research-notes.md): modeling scope and interpretation of exact versus regularized results
+- [Numerical Notes](numerical-notes.md): diagnostics, small-`eps` behavior, and practical caution points
+- [Getting Started](getting-started.md): installation and first runs
+- [CLI Reference](cli-reference.md): command-line options and generated files
+- [Examples](examples.md): gallery overview and selected comparisons
+- [Gallery Casebook](assets/gallery/gallery_casebook.md): longer generated notes for every built-in example
+- [API Guide](api.md): library entry points for scripting experiments
+- [Upgrade Notes](upgrade_notes.md): notebook-to-package transition notes
+- [Publishing](publishing.md): release and trusted-publisher configuration
 
 ## Typical Uses
 
-- computing exact discrete MOT bounds for two-step problems
-- comparing regularized approximations against LP benchmarks
-- studying the effect of different payoff structures under common marginals
-- generating reproducible figures and JSON summaries for notes or reports
-- exploring basic martingale geometry in a compact computational setting
+- exact discrete MOT bounds for two-step problems
+- comparison of regularized approximations against LP benchmarks
+- payoff sensitivity studies under fixed marginals
+- generation of figures and summaries for notes or reports
+- structured experimentation with small martingale systems
 
-## Suggested Reading Order
+## Suggested Starting Point
 
 1. [Getting Started](getting-started.md)
-2. [Examples](examples.md)
-3. [Numerical Notes](numerical-notes.md)
-4. [Research Notes](research-notes.md)
+2. [CLI Reference](cli-reference.md)
+3. [Examples](examples.md)
+4. [Gallery Casebook](assets/gallery/gallery_casebook.md)
+5. [Numerical Notes](numerical-notes.md)
 
-This order moves from execution to interpretation.
+This sequence moves from execution to inspection to interpretation.

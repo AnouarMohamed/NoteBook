@@ -18,7 +18,9 @@ def test_save_experiment_artifacts_writes_expected_files(tmp_path: Path):
     assert (tmp_path / "exact_uniform_summary.png").exists()
     assert (tmp_path / "regularization_path.png").exists()
     assert (tmp_path / "stability_diagnostics.png").exists()
+    assert (tmp_path / "structural_diagnostics.png").exists()
     assert (tmp_path / "summary.json").exists()
+    assert (tmp_path / "experiment_report.md").exists()
 
 
 def test_save_gallery_assets_writes_gallery_summary(tmp_path: Path):
@@ -52,8 +54,10 @@ def test_save_gallery_assets_writes_gallery_summary(tmp_path: Path):
     assert (tmp_path / "gallery_overview.png").exists()
     assert (tmp_path / "gallery_summary.json").exists()
     assert (tmp_path / "gallery_summary.md").exists()
+    assert (tmp_path / "gallery_casebook.md").exists()
     assert (tmp_path / "small_abs" / "summary.json").exists()
     assert (tmp_path / "small_call" / "summary.json").exists()
+    assert (tmp_path / "small_abs" / "experiment_report.md").exists()
 
 
 def test_render_gallery_markdown_contains_example_titles(tmp_path: Path):
@@ -74,3 +78,23 @@ def test_render_gallery_markdown_contains_example_titles(tmp_path: Path):
 
     assert "Demo example" in markdown
     assert "Smallest eps" in markdown
+
+
+def test_gallery_casebook_contains_links_and_titles(tmp_path: Path):
+    specs = (
+        GallerySpec(
+            slug="demo",
+            title="Demo example",
+            description="Demo",
+            x_interval=(1.0, 3.0),
+            y_interval=(0.0, 4.0),
+            n=8,
+            payoff_name="abs_spread",
+            eps_values=(0.3,),
+        ),
+    )
+    save_gallery_assets(tmp_path, specs)
+    casebook = (tmp_path / "gallery_casebook.md").read_text(encoding="utf-8")
+
+    assert "Demo example" in casebook
+    assert "structural_diagnostics.png" in casebook

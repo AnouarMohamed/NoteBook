@@ -123,6 +123,28 @@ def builtin_gallery_specs() -> tuple[GallerySpec, ...]:
             payoff_name="abs_spread",
             eps_values=(0.4, 0.15),
         ),
+        GallerySpec(
+            slug="wide_put",
+            title="Wide put on spread",
+            description="A downside-oriented payoff on the wider-marginal system, useful for comparison against wide absolute spread.",
+            x_interval=(0.0, 2.0),
+            y_interval=(-1.5, 3.5),
+            n=18,
+            payoff_name="put_on_spread",
+            strike=0.5,
+            eps_values=(0.4, 0.15),
+        ),
+        GallerySpec(
+            slug="broad_straddle",
+            title="Broad spread straddle",
+            description="A straddle-style payoff on the original supports, highlighting symmetric sensitivity around a nonzero strike.",
+            x_interval=(1.0, 3.0),
+            y_interval=(0.0, 4.0),
+            n=18,
+            payoff_name="straddle_on_spread",
+            strike=0.25,
+            eps_values=(0.4, 0.15),
+        ),
     )
 
 
@@ -196,6 +218,81 @@ def render_gallery_markdown(rows: list[GalleryRow]) -> str:
     return "\n".join([header, *body]) + "\n"
 
 
+def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
+    """Render a longer markdown report for the full gallery."""
+    lines = [
+        "# Gallery Casebook",
+        "",
+        "This document summarizes the built-in gallery in a longer form than the summary table.",
+        "",
+    ]
+    for entry in entries:
+        smallest_eps = None
+        smallest_expected = None
+        smallest_bias = None
+        if entry.experiment.regularized_results:
+            smallest_eps = min(entry.experiment.regularized_results)
+            result = entry.experiment.regularized_results[smallest_eps]
+            smallest_expected = result.expected_payoff
+            smallest_bias = result.expected_payoff - entry.experiment.exact_upper.value
+
+        lines.extend(
+            [
+                f"## {entry.spec.title}",
+                "",
+                entry.spec.description,
+                "",
+                "### Configuration",
+                "",
+                f"- `x_interval = {entry.spec.x_interval}`",
+                f"- `y_interval = {entry.spec.y_interval}`",
+                f"- `n = {entry.spec.n}`",
+                f"- `payoff = {entry.spec.payoff_name}`",
+                f"- `strike = {entry.spec.strike:.6f}`",
+                "",
+                "### Exact Results",
+                "",
+                "| Lower | Upper | Width |",
+                "|---:|---:|---:|",
+                (
+                    f"| {entry.experiment.exact_lower.value:.6f} | "
+                    f"{entry.experiment.exact_upper.value:.6f} | "
+                    f"{entry.experiment.exact_upper.value - entry.experiment.exact_lower.value:.6f} |"
+                ),
+            ]
+        )
+
+        if smallest_eps is not None and smallest_expected is not None and smallest_bias is not None:
+            lines.extend(
+                [
+                    "",
+                    "### Smallest Regularization Level",
+                    "",
+                    "| eps | Expected payoff | Bias to upper |",
+                    "|---:|---:|---:|",
+                    f"| {smallest_eps:g} | {smallest_expected:.6f} | {smallest_bias:+.6f} |",
+                ]
+            )
+
+        lines.extend(
+            [
+                "",
+                "### Figures",
+                "",
+                f"![{entry.spec.title} exact summary]({entry.spec.slug}/exact_uniform_summary.png)",
+                "",
+                f"![{entry.spec.title} structural diagnostics]({entry.spec.slug}/structural_diagnostics.png)",
+                "",
+                "### Files",
+                "",
+                f"- [`{entry.spec.slug}/experiment_report.md`]({entry.spec.slug}/experiment_report.md)",
+                f"- [`{entry.spec.slug}/summary.json`]({entry.spec.slug}/summary.json)",
+                "",
+            ]
+        )
+    return "\n".join(lines)
+
+
 def save_gallery_overview(output_dir: Path, rows: list[GalleryRow]) -> None:
     """Save a cross-example overview plot."""
     labels = [row.title for row in rows]
@@ -246,5 +343,8 @@ def save_gallery_assets(output_dir: Path, specs: tuple[GallerySpec, ...]) -> lis
     )
     (output_dir / "gallery_summary.md").write_text(
         render_gallery_markdown(rows), encoding="utf-8"
+    )
+    (output_dir / "gallery_casebook.md").write_text(
+        render_gallery_casebook(entries), encoding="utf-8"
     )
     return entries

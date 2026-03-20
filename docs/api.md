@@ -57,6 +57,7 @@ Key outputs:
 - `dual_gap`
 - `iterations`
 - marginal and martingale errors
+- the regularized plan itself
 
 `expected_payoff` and `regularized_primal` are distinct quantities. The latter includes the entropy term and should be interpreted separately.
 
@@ -136,7 +137,9 @@ Writes the standard artifact set for a single run:
 - `exact_uniform_summary.png`
 - `regularization_path.png`
 - `stability_diagnostics.png`
+- `structural_diagnostics.png`
 - `summary.json`
+- `experiment_report.md`
 
 ### `builtin_gallery_specs()`
 
@@ -146,16 +149,18 @@ Returns the curated example set used throughout the documentation. The current s
 - call and put spread examples
 - a quadratic spread example
 - centered straddle and centered call examples
-- a wider absolute-spread example
+- wide absolute-spread and wide put-on-spread examples
+- a broad spread straddle example
 
 ### `save_gallery_assets(...)`
 
 Runs the gallery and writes:
 
-- per-example folders with plots and JSON summaries
+- per-example folders with plots, JSON summaries, and markdown reports
 - `gallery_overview.png`
 - `gallery_summary.json`
 - `gallery_summary.md`
+- `gallery_casebook.md`
 
 ## Minimal End-To-End Script
 

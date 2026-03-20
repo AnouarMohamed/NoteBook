@@ -5,7 +5,7 @@ This page summarizes the package publishing workflow and the associated one-time
 
 ## GitHub Releases
 
-Tag pushes such as `v0.4.0` trigger the release workflow and attach the wheel and source distribution to a GitHub release.
+Tag pushes such as `v0.5.0` trigger the release workflow and attach the wheel and source distribution to a GitHub release.
 
 ## PyPI Workflow
 

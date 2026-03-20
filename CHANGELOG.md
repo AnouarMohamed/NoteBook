@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.5.0] - 2026-03-20
+
+### Added
+- structural diagnostics plots for each experiment, combining marginal profiles, conditional dispersion, and convex-order call gaps
+- per-experiment markdown reports generated alongside JSON summaries and figures
+- two new gallery examples: wide put on spread and broad spread straddle
+- a generated gallery casebook for long-form per-example notes
+- documentation pages for the discrete formulation and CLI reference
+
+### Changed
+- expanded the README into a fuller academic project overview
+- expanded the documentation with additional research-facing content and generated gallery material
+- bumped package metadata from `0.4.1` to `0.5.0`
+
 ## [0.4.1] - 2026-03-20
 
 ### Changed

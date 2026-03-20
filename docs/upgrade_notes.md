@@ -11,6 +11,7 @@ The project was upgraded by introducing:
 - tests for exact, regularized, reporting, and gallery workflows
 - packaging metadata and CLI entry points
 - gallery generation and machine-readable summaries
+- per-experiment markdown reports and structural diagnostics plots
 - documentation, CI, release workflows, and publishing workflows
 
 ## Correctness And Numerical Fixes

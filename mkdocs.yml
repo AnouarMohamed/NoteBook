@@ -31,11 +31,14 @@ extra_css:
 
 nav:
   - Home: index.md
+  - Discrete Formulation: discrete-formulation.md
   - Research Notes: research-notes.md
   - Numerical Notes: numerical-notes.md
   - Getting Started: getting-started.md
+  - CLI Reference: cli-reference.md
   - Examples: examples.md
   - Gallery Table: assets/gallery/gallery_summary.md
+  - Gallery Casebook: assets/gallery/gallery_casebook.md
   - API Guide: api.md
   - Upgrade Notes: upgrade_notes.md
   - Publishing: publishing.md

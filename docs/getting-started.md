@@ -22,7 +22,9 @@ This command writes the standard artifact set to `artifacts/`:
 - `exact_uniform_summary.png`
 - `regularization_path.png`
 - `stability_diagnostics.png`
+- `structural_diagnostics.png`
 - `summary.json`
+- `experiment_report.md`
 
 ## Installation Modes
 
@@ -80,6 +82,7 @@ For the default uniform absolute-spread example:
 - the exact lower value is close to `0.6`
 - the regularized expected payoff approaches the LP upper benchmark as `eps` decreases
 - dual gaps and martingale errors remain small in stable runs
+- structural diagnostics show a nonnegative convex-order call gap
 
 Substantial deviations from this pattern generally indicate either a different discretization regime or a numerical issue that warrants inspection.
 
@@ -122,7 +125,7 @@ Before interpreting a result, the following checks are useful:
 - the regularization path moves in the expected direction as `eps` decreases
 - the exact LP value is used as the benchmark for interpretation
 
-All of these quantities are recorded in `summary.json`.
+All of these quantities are recorded in `summary.json`, while the main figures are summarized again in `experiment_report.md`.
 
 ## Local Verification
 
