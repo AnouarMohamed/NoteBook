@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -101,6 +102,48 @@ def _save_regularization_path(output_dir: Path, experiment) -> None:
     plt.close(figure)
 
 
+def _write_summary_json(output_dir: Path, experiment) -> None:
+    summary = {
+        "n": experiment.n,
+        "exact_upper": {
+            "value": experiment.exact_upper.value,
+            "marginal_1_error": experiment.exact_upper.marginal_1_error,
+            "marginal_2_error": experiment.exact_upper.marginal_2_error,
+            "martingale_error": experiment.exact_upper.martingale_error,
+        },
+        "exact_lower": {
+            "value": experiment.exact_lower.value,
+            "marginal_1_error": experiment.exact_lower.marginal_1_error,
+            "marginal_2_error": experiment.exact_lower.marginal_2_error,
+            "martingale_error": experiment.exact_lower.martingale_error,
+        },
+        "benchmarks": {
+            "unrestricted_min_comonotone": (
+                experiment.unrestricted_benchmarks.unrestricted_min_comonotone
+            ),
+            "independent": experiment.unrestricted_benchmarks.independent,
+            "unrestricted_max_countermonotone": (
+                experiment.unrestricted_benchmarks.unrestricted_max_countermonotone
+            ),
+        },
+        "regularized": {
+            f"{eps:g}": {
+                "expected_payoff": result.expected_payoff,
+                "regularized_primal": result.regularized_primal,
+                "dual_value": result.dual_value,
+                "dual_gap": result.dual_gap,
+                "converged": result.converged,
+                "iterations": result.iterations,
+                "marginal_1_error": result.marginal_1_error,
+                "marginal_2_error": result.marginal_2_error,
+                "martingale_error": result.martingale_error,
+            }
+            for eps, result in sorted(experiment.regularized_results.items())
+        },
+    }
+    (output_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run the uniform |S1-S2| martingale optimal transport experiment."
@@ -157,6 +200,7 @@ def main() -> None:
 
     _save_exact_plan(args.output_dir, experiment)
     _save_regularization_path(args.output_dir, experiment)
+    _write_summary_json(args.output_dir, experiment)
 
 
 if __name__ == "__main__":

@@ -22,6 +22,10 @@ dev = [
 [project.scripts]
 mot-uniform = "mot_pricing.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/AnouarMohamed/JavaFinalJee"
+Repository = "https://github.com/AnouarMohamed/JavaFinalJee"
+
 [tool.setuptools.package-dir]
 "" = "src"
 

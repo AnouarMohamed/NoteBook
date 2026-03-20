@@ -1,5 +1,7 @@
 # MOT Pricing
 
+![CI](https://github.com/AnouarMohamed/JavaFinalJee/actions/workflows/ci.yml/badge.svg)
+
 `mot-pricing` turns the original one-off notebook into a reproducible Python project for robust pricing with martingale optimal transport (MOT).
 
 The reference experiment in this repository studies:
@@ -15,6 +17,7 @@ The codebase includes:
 - a numerically stable entropic regularization solver
 - corrected unrestricted coupling benchmarks
 - a CLI and script to reproduce the uniform example
+- JSON summaries for reproducible experiment outputs
 - tests for the exact and regularized solvers
 
 ## Why this repo exists
@@ -60,7 +63,8 @@ For the default uniform example:
 - `scripts/`: runnable entry script
 - `tests/`: regression and numerical checks
 - `notebooks/`: notebook material preserved from the original exploration
+- `.github/workflows/`: CI for test automation
 
 ## Notebook Status
 
-The original notebook is preserved under `notebooks/` as legacy exploratory work. The library and CLI are now the canonical implementation.
+The original notebook is preserved under `notebooks/` as legacy exploratory work. A clean report notebook now imports the library directly, and the library plus CLI are the canonical implementation.
