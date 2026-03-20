@@ -3,13 +3,44 @@
 This page summarizes the built-in gallery and highlights the principal numerical patterns across the current experiment set.
 {: .lead }
 
+<div class="metric-grid" markdown>
+<div class="metric-card" markdown>
+<div class="metric-label">Examples</div>
+<div class="metric-value">9</div>
+<div class="metric-note">The current gallery spans directional, symmetric, and widened-marginal cases.</div>
+</div>
+<div class="metric-card" markdown>
+<div class="metric-label">Largest Width</div>
+<div class="metric-value">0.4347</div>
+<div class="metric-note">Observed in the wide absolute-spread example.</div>
+</div>
+<div class="metric-card" markdown>
+<div class="metric-label">Smallest Width</div>
+<div class="metric-value">0.0000</div>
+<div class="metric-note">Observed in the quadratic-spread example for the current discretization.</div>
+</div>
+</div>
+
 ## Gallery Overview
 
 The built-in gallery currently contains nine examples. These include directional payoffs, symmetric payoffs, widened marginals, and a quadratic case whose interval nearly collapses in the present discretization.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Gallery overview](assets/gallery/gallery_overview.png)
 
-Long-form generated notes are available in the [Gallery Casebook](assets/gallery/gallery_casebook.md).
+<div class="caption">Cross-example view of robust lower and upper values together with interval widths.</div>
+</div>
+<div class="figure-card" markdown>
+### Gallery Files
+
+- [Gallery Table](assets/gallery/gallery_summary.md)
+- [Gallery Summary JSON](assets/gallery/gallery_summary.json)
+- [Gallery Casebook](assets/gallery/gallery_casebook.md)
+
+<div class="caption">The generated casebook contains per-example configuration, figures, and links to the individual reports.</div>
+</div>
+</div>
 
 ## Summary Table
 
@@ -24,11 +55,6 @@ Long-form generated notes are available in the [Gallery Casebook](assets/gallery
 | Wide absolute spread | 0.8754 | 1.3101 | 0.4347 | 1.2487 |
 | Wide put on spread | 0.7133 | 0.9382 | 0.2249 | 0.8868 |
 | Broad spread straddle | 0.6217 | 1.0194 | 0.3977 | 0.9587 |
-
-Machine-readable summary files:
-
-- [`docs/assets/gallery/gallery_summary.md`](assets/gallery/gallery_summary.md)
-- [`docs/assets/gallery/gallery_summary.json`](assets/gallery/gallery_summary.json)
 
 ## Reading Conventions
 
@@ -50,9 +76,18 @@ The examples are interpreted according to the following conventions:
 
 This remains the baseline experiment for the repository. The interval is substantial, and the unrestricted countermonotone benchmark is materially larger than the exact martingale upper value.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Uniform abs spread exact summary](assets/gallery/uniform_abs_spread/exact_uniform_summary.png)
 
+<div class="caption">Exact upper plan together with the benchmark comparison panel.</div>
+</div>
+<div class="figure-card" markdown>
 ![Uniform abs spread structural diagnostics](assets/gallery/uniform_abs_spread/structural_diagnostics.png)
+
+<div class="caption">Marginal profiles, conditional dispersion, and convex-order call gap.</div>
+</div>
+</div>
 
 ### Directional Spread Comparison
 
@@ -63,9 +98,18 @@ The call-on-spread and put-on-spread examples provide a useful directional compa
 
 The widths coincide in the current discretization, but the interval levels differ. This separates directional asymmetry from overall interval scale.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Call spread exact summary](assets/gallery/call_spread/exact_uniform_summary.png)
 
+<div class="caption">Directional payoff emphasizing upward spread moves.</div>
+</div>
+<div class="figure-card" markdown>
 ![Put spread exact summary](assets/gallery/put_spread/exact_uniform_summary.png)
+
+<div class="caption">Directional payoff emphasizing downward spread moves.</div>
+</div>
+</div>
 
 ### Centered Symmetric System
 
@@ -76,9 +120,18 @@ The centered straddle and centered call examples move to `S1 ~ Uniform[-1, 1]` a
 
 These examples are useful when geometric symmetry is desirable without eliminating nontrivial pricing intervals.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Centered straddle exact summary](assets/gallery/centered_straddle/exact_uniform_summary.png)
 
+<div class="caption">Symmetric setup with one of the widest intervals in the current gallery.</div>
+</div>
+<div class="figure-card" markdown>
 ![Centered call exact summary](assets/gallery/centered_call/exact_uniform_summary.png)
+
+<div class="caption">Directional payoff on the centered support pair.</div>
+</div>
+</div>
 
 ### Wider-Marginal Regime
 
@@ -89,9 +142,18 @@ The wide absolute-spread and wide put-on-spread examples increase the variance o
 
 These examples show how increased dispersion in the second marginal broadens or shifts the robust pricing range.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Wide abs exact summary](assets/gallery/wide_abs/exact_uniform_summary.png)
 
+<div class="caption">Absolute-spread behavior under a noticeably wider second marginal.</div>
+</div>
+<div class="figure-card" markdown>
 ![Wide put exact summary](assets/gallery/wide_put/exact_uniform_summary.png)
+
+<div class="caption">Downside-oriented payoff in the wider-marginal regime.</div>
+</div>
+</div>
 
 ### Broad Straddle
 
@@ -103,23 +165,39 @@ The broad spread straddle retains the original support pair but changes the payo
 
 This example complements the original absolute-spread benchmark by introducing a symmetric payoff around a nonzero strike.
 
+<div class="figure-grid" markdown>
+<div class="figure-card" markdown>
 ![Broad straddle exact summary](assets/gallery/broad_straddle/exact_uniform_summary.png)
+
+<div class="caption">Symmetric spread sensitivity around a shifted center.</div>
+</div>
+<div class="figure-card" markdown>
+![Broad straddle structural diagnostics](assets/gallery/broad_straddle/structural_diagnostics.png)
+
+<div class="caption">Structural diagnostics for the shifted straddle configuration.</div>
+</div>
+</div>
 
 ## Diagnostic Figures
 
 Two diagnostic families are particularly useful in practice.
 
+<div class="card-grid" markdown>
+<div class="card" markdown>
 ### Regularization Paths
 
 - [`uniform_abs_spread/regularization_path.png`](assets/gallery/uniform_abs_spread/regularization_path.png)
 - [`wide_abs/regularization_path.png`](assets/gallery/wide_abs/regularization_path.png)
 - [`broad_straddle/regularization_path.png`](assets/gallery/broad_straddle/regularization_path.png)
-
+</div>
+<div class="card" markdown>
 ### Structural Diagnostics
 
 - [`uniform_abs_spread/structural_diagnostics.png`](assets/gallery/uniform_abs_spread/structural_diagnostics.png)
 - [`centered_straddle/structural_diagnostics.png`](assets/gallery/centered_straddle/structural_diagnostics.png)
 - [`wide_put/structural_diagnostics.png`](assets/gallery/wide_put/structural_diagnostics.png)
+</div>
+</div>
 
 The structural diagnostics combine marginal profiles, conditional dispersion, and convex-order call gaps in a single figure.
 
