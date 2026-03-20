@@ -30,7 +30,7 @@ from .payoffs import PayoffSpec, builtin_payoff_names, make_builtin_payoff
 from .regularized import RegularizedMOTResult, sinkhorn_mot
 from .reporting import save_experiment_artifacts
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 __all__ = [
     "__version__",

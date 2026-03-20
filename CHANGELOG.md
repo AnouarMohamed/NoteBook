@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [0.4.1] - 2026-03-20
+
+### Changed
+- bumped package metadata from `0.4.0` to `0.4.1` so TestPyPI and PyPI receive a new immutable release
+- made the publish workflow idempotent on reruns by enabling `skip-existing` for package uploads
+
 ## [0.4.0] - 2026-03-20
 
 ### Added
