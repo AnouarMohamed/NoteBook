@@ -18,8 +18,10 @@ from .exact import (
     solve_exact_mot,
 )
 from .experiments import (
+    CausalExperimentResult,
     DiscreteExperimentResult,
     UniformExperimentResult,
+    run_causal_experiment,
     run_discrete_experiment,
     run_two_uniform_experiment,
     run_uniform_abs_spread_experiment,
@@ -45,7 +47,7 @@ from .marginals import (
 )
 from .payoffs import PayoffSpec, builtin_payoff_names, make_builtin_payoff
 from .regularized import RegularizedMOTResult, sinkhorn_mot
-from .reporting import save_experiment_artifacts
+from .reporting import save_causal_experiment_artifacts, save_experiment_artifacts
 
 __version__ = "0.5.0"
 
@@ -56,6 +58,7 @@ __all__ = [
     "CausalMarginalChain",
     "CausalMOTResult",
     "CausalBoundGap",
+    "CausalExperimentResult",
     "ConvexOrderCheck",
     "DiscreteExperimentResult",
     "DiscreteMarginal",
@@ -81,12 +84,14 @@ __all__ = [
     "make_uniform_grid",
     "make_uniform_marginal",
     "gallery_rows",
+    "run_causal_experiment",
     "run_discrete_experiment",
     "run_gallery",
     "run_two_uniform_experiment",
     "run_uniform_abs_spread_experiment",
     "reconstruct_causal_plan",
     "save_experiment_artifacts",
+    "save_causal_experiment_artifacts",
     "save_gallery_assets",
     "sinkhorn_mot",
     "solve_exact_causal_mot",

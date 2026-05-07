@@ -38,6 +38,7 @@ docs = [
 
 [project.scripts]
 mot-uniform = "mot_pricing.cli:main"
+mot-causal = "mot_pricing.cli:main_causal"
 mot-gallery = "mot_pricing.gallery_cli:main"
 
 [project.urls]

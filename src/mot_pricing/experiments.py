@@ -7,10 +7,19 @@ from dataclasses import dataclass
 import numpy as np
 
 from .benchmarks import UniformAbsSpreadBenchmarks, abs_spread_uniform_benchmarks
-from .exact import ExactMOTResult, solve_exact_mot
+from .causal_regularized import CausalMOTResult, causal_sinkhorn_mot
+from .exact import (
+    CausalBoundGap,
+    ExactMOTResult,
+    solve_exact_causal_mot,
+    solve_exact_mot,
+)
 from .marginals import (
+    CausalFeasibilityReport,
+    CausalMarginalChain,
     ConvexOrderCheck,
     DiscreteMarginal,
+    check_causal_feasibility,
     check_convex_order_discrete,
     make_uniform_marginal,
 )
@@ -29,6 +38,30 @@ class DiscreteExperimentResult:
     exact_lower: ExactMOTResult
     unrestricted_benchmarks: UniformAbsSpreadBenchmarks | None
     regularized_results: dict[float, RegularizedMOTResult]
+
+
+@dataclass(frozen=True)
+class CausalExperimentResult:
+    chain: CausalMarginalChain
+    payoff: PayoffSpec
+    feasibility: CausalFeasibilityReport
+    exact_upper: ExactMOTResult
+    exact_lower: ExactMOTResult
+    pairwise_upper_bound: float
+    pairwise_lower_bound: float
+    causal_bound_gap: CausalBoundGap
+    regularized_results: dict[float, CausalMOTResult]
+
+    @property
+    def step_count(self) -> int:
+        return self.chain.step_count
+
+    @property
+    def per_step_plans(self) -> dict[float, tuple[np.ndarray, ...]]:
+        return {
+            eps: tuple(step.plan for step in result.steps)
+            for eps, result in self.regularized_results.items()
+        }
 
 
 UniformExperimentResult = DiscreteExperimentResult
@@ -92,6 +125,94 @@ def run_discrete_experiment(
         exact_upper=exact_upper,
         exact_lower=exact_lower,
         unrestricted_benchmarks=unrestricted_benchmarks,
+        regularized_results=regularized_results,
+    )
+
+
+def _additive_causal_payoff(payoff: PayoffSpec):
+    def additive_payoff(*grids):
+        total = np.zeros_like(grids[0], dtype=float)
+        for left, right in zip(grids[:-1], grids[1:]):
+            total = total + payoff.function(left, right)
+        return total
+
+    return additive_payoff
+
+
+def _pairwise_exact_bound(
+    chain: CausalMarginalChain,
+    payoff: PayoffSpec,
+    objective: str,
+) -> float:
+    return float(
+        sum(
+            solve_exact_mot(
+                marginal_1.atoms,
+                marginal_1.weights,
+                marginal_2.atoms,
+                marginal_2.weights,
+                payoff.function,
+                objective=objective,
+            ).value
+            for marginal_1, marginal_2 in chain.pairs()
+        )
+    )
+
+
+def run_causal_experiment(
+    chain: CausalMarginalChain,
+    payoff: PayoffSpec,
+    *,
+    eps_values: tuple[float, ...] = (),
+    sinkhorn_iterations: int = 600,
+    sinkhorn_tolerance: float = 1e-8,
+) -> CausalExperimentResult:
+    """Run exact and regularized causal MOT over a marginal chain."""
+    feasibility = check_causal_feasibility(chain)
+    if not feasibility.feasible:
+        raise ValueError(f"causal chain is infeasible: {feasibility.summary}")
+
+    causal_payoff = _additive_causal_payoff(payoff)
+    exact_upper = solve_exact_causal_mot(
+        chain,
+        causal_payoff,
+        objective="max",
+    )
+    exact_lower = solve_exact_causal_mot(
+        chain,
+        causal_payoff,
+        objective="min",
+    )
+    pairwise_upper_bound = _pairwise_exact_bound(chain, payoff, "max")
+    pairwise_lower_bound = _pairwise_exact_bound(chain, payoff, "min")
+    causal_bound_gap = CausalBoundGap(
+        absolute_gap=pairwise_upper_bound - exact_upper.value,
+        relative_gap=(
+            0.0
+            if pairwise_upper_bound == 0.0
+            else (pairwise_upper_bound - exact_upper.value) / abs(pairwise_upper_bound)
+        ),
+    )
+
+    regularized_results: dict[float, CausalMOTResult] = {}
+    for eps in eps_values:
+        regularized_results[eps] = causal_sinkhorn_mot(
+            chain,
+            payoff.function,
+            eps,
+            n_iter=sinkhorn_iterations,
+            tol=sinkhorn_tolerance,
+        )
+
+    return CausalExperimentResult(
+        chain=chain,
+        payoff=payoff,
+        feasibility=feasibility,
+        exact_upper=exact_upper,
+        exact_lower=exact_lower,
+        pairwise_upper_bound=pairwise_upper_bound,
+        pairwise_lower_bound=pairwise_lower_bound,
+        causal_bound_gap=causal_bound_gap,
         regularized_results=regularized_results,
     )
 
