@@ -1,6 +1,13 @@
 """Utilities for robust pricing with martingale optimal transport."""
 
 from .benchmarks import UniformAbsSpreadBenchmarks, abs_spread_uniform_benchmarks
+from .causal_regularized import (
+    CausalConstraintErrors,
+    CausalMOTResult,
+    causal_constraint_errors,
+    causal_sinkhorn_mot,
+    reconstruct_causal_plan,
+)
 from .discretization import make_uniform_grid
 from .exact import ExactMOTResult, constraint_errors, solve_exact_mot
 from .experiments import (
@@ -37,8 +44,10 @@ __version__ = "0.5.0"
 
 __all__ = [
     "__version__",
+    "CausalConstraintErrors",
     "CausalFeasibilityReport",
     "CausalMarginalChain",
+    "CausalMOTResult",
     "ConvexOrderCheck",
     "DiscreteExperimentResult",
     "DiscreteMarginal",
@@ -53,6 +62,8 @@ __all__ = [
     "abs_spread_uniform_benchmarks",
     "builtin_gallery_specs",
     "builtin_payoff_names",
+    "causal_constraint_errors",
+    "causal_sinkhorn_mot",
     "check_causal_feasibility",
     "check_convex_order_discrete",
     "constraint_errors",
@@ -65,6 +76,7 @@ __all__ = [
     "run_gallery",
     "run_two_uniform_experiment",
     "run_uniform_abs_spread_experiment",
+    "reconstruct_causal_plan",
     "save_experiment_artifacts",
     "save_gallery_assets",
     "sinkhorn_mot",
