@@ -12,6 +12,7 @@ from scipy.optimize import linprog
 
 Array1D = NDArray[np.float64]
 Array2D = NDArray[np.float64]
+ArrayND = NDArray[np.float64]
 Objective = Literal["max", "min"]
 
 
@@ -81,11 +82,18 @@ def constraint_errors(
 class ExactMOTResult:
     objective: Objective
     value: float
-    plan: Array2D
-    payoff_matrix: Array2D
+    plan: ArrayND
+    payoff_matrix: ArrayND
     marginal_1_error: float
     marginal_2_error: float
     martingale_error: float
+    causal_plan: ArrayND | None = None
+
+
+@dataclass(frozen=True)
+class CausalBoundGap:
+    absolute_gap: float
+    relative_gap: float
 
 
 def solve_exact_mot(
@@ -157,4 +165,123 @@ def solve_exact_mot(
         marginal_1_error=marginal_1_error,
         marginal_2_error=marginal_2_error,
         martingale_error=martingale_error,
+    )
+
+
+def _evaluate_multiperiod_payoff(chain, payoff_fn: Callable[..., ArrayND]) -> ArrayND:
+    grids = np.meshgrid(
+        *(marginal.atoms for marginal in chain.marginals),
+        indexing="ij",
+    )
+    payoff_tensor = np.asarray(payoff_fn(*grids), dtype=float)
+    expected_shape = tuple(marginal.size for marginal in chain.marginals)
+    if payoff_tensor.shape != expected_shape:
+        raise ValueError("payoff_fn must return an array shaped like the atom grid")
+    return payoff_tensor
+
+
+def _flat_index(indices: tuple[int, ...], shape: tuple[int, ...]) -> int:
+    return int(np.ravel_multi_index(indices, shape))
+
+
+def solve_exact_causal_mot(
+    chain,
+    payoff_fn: Callable[..., ArrayND],
+    objective: Objective = "max",
+) -> ExactMOTResult:
+    """Solve the multi-period discrete martingale OT problem exactly."""
+    if objective not in {"max", "min"}:
+        raise ValueError("objective must be 'max' or 'min'")
+
+    shape = tuple(marginal.size for marginal in chain.marginals)
+    flat_size = int(np.prod(shape))
+    payoff_tensor = _evaluate_multiperiod_payoff(chain, payoff_fn)
+    sign = -1.0 if objective == "max" else 1.0
+    c = sign * payoff_tensor.ravel()
+
+    marginal_rows = sum(shape)
+    martingale_rows = sum(
+        int(np.prod(shape[: step + 1])) for step in range(chain.step_count)
+    )
+    a_eq = np.zeros((marginal_rows + martingale_rows, flat_size), dtype=float)
+    b_eq = np.zeros(marginal_rows + martingale_rows, dtype=float)
+    row = 0
+
+    all_indices = list(np.ndindex(shape))
+    for axis, marginal in enumerate(chain.marginals):
+        for atom_index, weight in enumerate(marginal.weights):
+            for index in all_indices:
+                if index[axis] == atom_index:
+                    a_eq[row, _flat_index(index, shape)] = 1.0
+            b_eq[row] = weight
+            row += 1
+
+    for step in range(chain.step_count):
+        current_atoms = chain.marginals[step].atoms
+        next_atoms = chain.marginals[step + 1].atoms
+        prefix_shape = shape[: step + 1]
+        for prefix in np.ndindex(prefix_shape):
+            current_atom = current_atoms[prefix[-1]]
+            for suffix in np.ndindex(shape[step + 1 :]):
+                index = prefix + suffix
+                next_atom = next_atoms[suffix[0]]
+                a_eq[row, _flat_index(index, shape)] = next_atom - current_atom
+            row += 1
+
+    result = linprog(
+        c,
+        A_eq=a_eq,
+        b_eq=b_eq,
+        bounds=[(0.0, None)] * flat_size,
+        method="highs",
+    )
+    if result.status != 0:
+        raise RuntimeError(f"causal LP solve failed: {result.message}")
+
+    value = float(-result.fun if objective == "max" else result.fun)
+    plan = result.x.reshape(shape)
+    marginal_errors = []
+    for axis, marginal in enumerate(chain.marginals):
+        axes = tuple(i for i in range(plan.ndim) if i != axis)
+        marginal_errors.append(
+            float(np.max(np.abs(plan.sum(axis=axes) - marginal.weights)))
+        )
+
+    martingale_errors = []
+    for step in range(chain.step_count):
+        keep_axes = {step, step + 1}
+        sum_axes = tuple(axis for axis in range(plan.ndim) if axis not in keep_axes)
+        adjacent = plan.sum(axis=sum_axes) if sum_axes else plan
+        _, _, martingale_error = constraint_errors(
+            adjacent,
+            chain.marginals[step].weights,
+            chain.marginals[step + 1].weights,
+            chain.marginals[step].atoms,
+            chain.marginals[step + 1].atoms,
+        )
+        martingale_errors.append(martingale_error)
+
+    return ExactMOTResult(
+        objective=objective,
+        value=value,
+        plan=plan,
+        payoff_matrix=payoff_tensor,
+        marginal_1_error=marginal_errors[0],
+        marginal_2_error=float(max(marginal_errors[1:], default=0.0)),
+        martingale_error=float(max(martingale_errors, default=0.0)),
+        causal_plan=plan,
+    )
+
+
+def compute_causal_bound_gap(
+    exact_causal: ExactMOTResult,
+    exact_unconstrained: ExactMOTResult,
+) -> CausalBoundGap:
+    """Return how much an unconstrained upper bound exceeds the causal bound."""
+    absolute_gap = exact_unconstrained.value - exact_causal.value
+    denominator = abs(exact_unconstrained.value)
+    relative_gap = 0.0 if denominator == 0.0 else absolute_gap / denominator
+    return CausalBoundGap(
+        absolute_gap=float(absolute_gap),
+        relative_gap=float(relative_gap),
     )

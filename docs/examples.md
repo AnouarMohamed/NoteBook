@@ -5,7 +5,7 @@ This page summarizes the built-in gallery and highlights the principal numerical
 
 ## Gallery Overview
 
-The built-in gallery currently contains nine examples. These include directional payoffs, symmetric payoffs, widened marginals, and a quadratic case whose interval nearly collapses in the present discretization.
+The built-in gallery currently contains twelve examples. These include directional payoffs, symmetric payoffs, widened marginals, a quadratic case whose interval nearly collapses in the present discretization, and causal multi-period studies.
 
 ![Gallery overview](assets/gallery/gallery_overview.png)
 <div class="caption">Cross-example view of robust lower and upper values together with interval widths.</div>
@@ -29,6 +29,9 @@ Related files:
 | Wide absolute spread | 0.8754 | 1.3101 | 0.4347 | 1.2487 |
 | Wide put on spread | 0.7133 | 0.9382 | 0.2249 | 0.8868 |
 | Broad spread straddle | 0.6217 | 1.0194 | 0.3977 | 0.9587 |
+| Causal absolute spread T3 | see generated gallery | see generated gallery | see generated gallery | see generated gallery |
+| Causal call T4 | see generated gallery | see generated gallery | see generated gallery | see generated gallery |
+| Causal convergence study | see generated gallery | see generated gallery | see generated gallery | n/a |
 
 ## Reading Conventions
 
@@ -117,6 +120,21 @@ This example complements the original absolute-spread benchmark by introducing a
 ![Broad straddle structural diagnostics](assets/gallery/broad_straddle/structural_diagnostics.png)
 <div class="caption">Structural diagnostics for the shifted straddle configuration.</div>
 
+### Causal Multi-Period Examples
+
+The causal gallery entries use chains of marginals rather than a single two-period pair.
+
+- causal absolute spread T3: three uniform marginals widening from `[1, 3]` to `[0, 4]`
+- causal call T4: four marginals with an adjacent call-on-spread payoff
+- causal convergence study: selected `T` values for an additive absolute-spread time-step study
+
+These entries write causal artifact names such as:
+
+- `causal_transport_chain.png`
+- `causal_summary.json`
+- `causal_experiment_report.md`
+- `continuous_limit.png` for convergence studies
+
 ## Diagnostic Figures
 
 Useful diagnostics include:
@@ -134,8 +152,9 @@ The structural diagnostics combine marginal profiles, conditional dispersion, an
 
 Each example directory includes:
 
-- `experiment_report.md`
-- `summary.json`
-- exact, regularization, stability, and structural plots
+- `experiment_report.md` and `summary.json` for two-period entries
+- `causal_experiment_report.md` and `causal_summary.json` for causal entries
+- `continuous_summary.json` for convergence entries
+- matching exact, regularization, causal, or continuous-limit plots
 
 These files are linked from the generated [Gallery Casebook](assets/gallery/gallery_casebook.md).

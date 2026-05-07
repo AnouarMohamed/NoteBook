@@ -458,3 +458,285 @@ def save_experiment_artifacts(output_dir: Path, experiment) -> None:
     save_structural_diagnostics_plot(output_dir, experiment)
     write_summary_json(output_dir, experiment)
     write_experiment_markdown(output_dir, experiment)
+
+
+def plot_causal_transport_chain(output_dir: Path, result) -> None:
+    """Save per-step causal transport heatmaps."""
+    plans = []
+    if result.regularized_results:
+        smallest_eps = min(result.regularized_results)
+        plans = [step.plan for step in result.regularized_results[smallest_eps].steps]
+    else:
+        plan = result.exact_upper.plan
+        for step in range(result.chain.step_count):
+            axes = tuple(
+                axis for axis in range(plan.ndim) if axis not in {step, step + 1}
+            )
+            plans.append(plan.sum(axis=axes) if axes else plan)
+
+    figure, axes = plt.subplots(
+        1, result.step_count, figsize=(5 * result.step_count, 4.5)
+    )
+    axes_array = np.atleast_1d(axes)
+    for step, (axis, plan) in enumerate(zip(axes_array, plans), start=1):
+        marginal_1, marginal_2 = result.chain.marginals[step - 1 : step + 1]
+        image = axis.imshow(
+            plan.T,
+            origin="lower",
+            aspect="auto",
+            extent=[
+                marginal_1.atoms[0],
+                marginal_1.atoms[-1],
+                marginal_2.atoms[0],
+                marginal_2.atoms[-1],
+            ],
+            cmap="YlGnBu",
+            interpolation="nearest",
+        )
+        axis.set_title(f"S{step} to S{step + 1}")
+        axis.set_xlabel(f"s{step}")
+        axis.set_ylabel(f"s{step + 1}")
+        figure.colorbar(image, ax=axis)
+    figure.tight_layout()
+    figure.savefig(output_dir / "causal_transport_chain.png", bbox_inches="tight")
+    plt.close(figure)
+
+
+def plot_causal_bound_convergence(output_dir: Path, result) -> None:
+    """Save causal bound convergence against regularization strength."""
+    if not result.regularized_results:
+        return
+    eps_values = sorted(result.regularized_results)
+    expected = [
+        result.regularized_results[eps].overall_expected_payoff for eps in eps_values
+    ]
+    figure, axis = plt.subplots(figsize=(7, 4.5))
+    axis.semilogx(eps_values, expected, "o-", linewidth=2, color="#3182bd")
+    axis.axhline(
+        result.exact_upper.value,
+        linestyle="--",
+        linewidth=1.5,
+        color="#cb181d",
+        label=f"exact causal upper = {result.exact_upper.value:.6f}",
+    )
+    axis.set_title("Causal bound convergence")
+    axis.set_xlabel("eps")
+    axis.set_ylabel("expected payoff")
+    axis.grid(alpha=0.3)
+    axis.legend()
+    figure.tight_layout()
+    figure.savefig(output_dir / "causal_bound_convergence.png", bbox_inches="tight")
+    plt.close(figure)
+
+
+def plot_marginal_evolution(output_dir: Path, result) -> None:
+    """Save marginal distributions across causal time steps."""
+    figure, axis = plt.subplots(figsize=(8, 4.5))
+    for index, marginal in enumerate(result.chain.marginals, start=1):
+        axis.plot(
+            marginal.atoms,
+            marginal.weights,
+            "o-",
+            linewidth=2,
+            label=marginal.name or f"S{index}",
+        )
+    axis.set_title("Marginal evolution")
+    axis.set_xlabel("atom")
+    axis.set_ylabel("weight")
+    axis.grid(alpha=0.3)
+    axis.legend()
+    figure.tight_layout()
+    figure.savefig(output_dir / "marginal_evolution.png", bbox_inches="tight")
+    plt.close(figure)
+
+
+def plot_causal_vs_unconstrained(output_dir: Path, result) -> None:
+    """Save causal exact and pairwise benchmark comparison."""
+    labels = ["pairwise lower", "causal lower", "causal upper", "pairwise upper"]
+    values = [
+        result.pairwise_lower_bound,
+        result.exact_lower.value,
+        result.exact_upper.value,
+        result.pairwise_upper_bound,
+    ]
+    figure, axis = plt.subplots(figsize=(8, 4.5))
+    axis.bar(labels, values, color=["#9ecae1", "#74c476", "#fd8d3c", "#756bb1"])
+    axis.set_title("Causal vs pairwise bounds")
+    axis.set_ylabel("expected payoff")
+    axis.tick_params(axis="x", rotation=15)
+    axis.grid(alpha=0.3, axis="y")
+    figure.tight_layout()
+    figure.savefig(output_dir / "causal_vs_unconstrained.png", bbox_inches="tight")
+    plt.close(figure)
+
+
+def write_causal_summary_json(output_dir: Path, result) -> None:
+    """Write a machine-readable causal experiment summary."""
+    summary = {
+        "step_count": result.step_count,
+        "payoff": {
+            "name": result.payoff.name,
+            "description": result.payoff.description,
+            "strike": result.payoff.strike,
+        },
+        "marginals": [
+            {
+                "name": marginal.name,
+                "size": marginal.size,
+                "mean": marginal.mean,
+                "variance": marginal.variance,
+            }
+            for marginal in result.chain.marginals
+        ],
+        "feasibility": {
+            "feasible": result.feasibility.feasible,
+            "mean_gaps": result.feasibility.mean_gaps.tolist(),
+            "min_call_gaps": result.feasibility.min_call_gaps.tolist(),
+            "max_call_gaps": result.feasibility.max_call_gaps.tolist(),
+            "summary": result.feasibility.summary,
+        },
+        "exact": {
+            "lower": result.exact_lower.value,
+            "upper": result.exact_upper.value,
+            "martingale_error": result.exact_upper.martingale_error,
+        },
+        "pairwise_bounds": {
+            "lower": result.pairwise_lower_bound,
+            "upper": result.pairwise_upper_bound,
+        },
+        "causal_bound_gap": {
+            "absolute": result.causal_bound_gap.absolute_gap,
+            "relative": result.causal_bound_gap.relative_gap,
+        },
+        "regularized": {
+            f"{eps:g}": {
+                "overall_expected_payoff": regularized.overall_expected_payoff,
+                "converged": regularized.converged,
+                "per_step_dual_gap": regularized.per_step_dual_gap.tolist(),
+                "max_marginal_error": regularized.constraint_errors.max_marginal_error,
+                "max_martingale_error": regularized.constraint_errors.max_martingale_error,
+            }
+            for eps, regularized in sorted(result.regularized_results.items())
+        },
+    }
+    (output_dir / "causal_summary.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
+
+
+def write_causal_experiment_markdown(output_dir: Path, result) -> None:
+    """Write a compact markdown report for a causal experiment."""
+    lines = [
+        f"# Causal Experiment Report: {result.payoff.description}",
+        "",
+        "## Setup",
+        "",
+        f"- steps: `{result.step_count}`",
+        f"- payoff: `{result.payoff.name}`",
+        f"- feasibility: `{result.feasibility.feasible}`",
+        "",
+        "## Exact Bounds",
+        "",
+        "| Bound | Value |",
+        "|---|---:|",
+        f"| causal lower | {result.exact_lower.value:.6f} |",
+        f"| causal upper | {result.exact_upper.value:.6f} |",
+        f"| pairwise lower | {result.pairwise_lower_bound:.6f} |",
+        f"| pairwise upper | {result.pairwise_upper_bound:.6f} |",
+        "",
+        "## Causal Bound Gap",
+        "",
+        f"- absolute: `{result.causal_bound_gap.absolute_gap:.6f}`",
+        f"- relative: `{result.causal_bound_gap.relative_gap:.6f}`",
+    ]
+    if result.regularized_results:
+        lines.extend(
+            [
+                "",
+                "## Regularized Runs",
+                "",
+                "| eps | Expected payoff | Max marginal error | Max martingale error | Converged |",
+                "|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for eps, regularized in sorted(result.regularized_results.items()):
+            lines.append(
+                f"| {eps:g} | {regularized.overall_expected_payoff:.6f} | "
+                f"{regularized.constraint_errors.max_marginal_error:.2e} | "
+                f"{regularized.constraint_errors.max_martingale_error:.2e} | "
+                f"{regularized.converged} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Artifact Files",
+            "",
+            "- `causal_transport_chain.png`",
+            "- `causal_bound_convergence.png`",
+            "- `marginal_evolution.png`",
+            "- `causal_vs_unconstrained.png`",
+            "- `causal_summary.json`",
+        ]
+    )
+    (output_dir / "causal_experiment_report.md").write_text(
+        "\n".join(lines) + "\n", encoding="utf-8"
+    )
+
+
+def save_causal_experiment_artifacts(output_dir: Path, result) -> None:
+    """Save standard artifacts for a causal experiment."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    plot_causal_transport_chain(output_dir, result)
+    plot_causal_bound_convergence(output_dir, result)
+    plot_marginal_evolution(output_dir, result)
+    plot_causal_vs_unconstrained(output_dir, result)
+    write_causal_summary_json(output_dir, result)
+    write_causal_experiment_markdown(output_dir, result)
+
+
+def plot_continuous_limit(output_dir: Path, result) -> None:
+    """Save a continuous-limit convergence plot."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    widths = result.upper_bounds - result.lower_bounds
+
+    figure, axis = plt.subplots(figsize=(8, 5))
+    axis.semilogx(
+        result.T_values,
+        result.upper_bounds,
+        "o-",
+        linewidth=2,
+        color="#cb181d",
+        label="upper",
+    )
+    axis.semilogx(
+        result.T_values,
+        result.lower_bounds,
+        "s-",
+        linewidth=2,
+        color="#3182bd",
+        label="lower",
+    )
+    if result.payoff_name == "abs_spread" and len(result.upper_bounds) > 0:
+        axis.axhline(
+            result.upper_bounds[-1],
+            linestyle="--",
+            linewidth=1.0,
+            color="#636363",
+            label="finest grid reference",
+        )
+    axis.set_title("Causal bounds versus time discretization")
+    axis.set_xlabel("time steps")
+    axis.set_ylabel("expected payoff")
+    axis.grid(alpha=0.3, which="both")
+    axis.legend()
+
+    inset = axis.inset_axes([0.58, 0.13, 0.37, 0.35])
+    inset.loglog(result.T_values, np.maximum(widths, 1e-18), "o-", color="#31a354")
+    inset.set_title(f"width slope {result.convergence_rate:.2f}", fontsize=9)
+    inset.set_xlabel("T", fontsize=8)
+    inset.set_ylabel("width", fontsize=8)
+    inset.grid(alpha=0.25, which="both")
+
+    figure.tight_layout()
+    figure.savefig(output_dir / "continuous_limit.png", bbox_inches="tight")
+    plt.close(figure)

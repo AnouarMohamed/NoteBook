@@ -70,12 +70,51 @@ The gallery output contains:
 
 Each example subdirectory contains the same standard files produced by `mot-uniform`.
 
+For causal gallery entries, subdirectories contain causal artifact names such as `causal_summary.json` and `causal_experiment_report.md`. Continuous convergence entries contain `continuous_limit.png` and `continuous_summary.json`.
+
+## `mot-causal`
+
+`mot-causal` runs a causal multi-period experiment on a chain of uniform marginals.
+
+### Usage
+
+```bash
+mot-causal [options]
+```
+
+### Main Options
+
+| Option | Meaning | Default |
+|---|---|---|
+| `--n` | atoms per time step | `30` |
+| `--intervals A,B ...` | one support interval per time step, formatted as comma-separated bounds | `1,3 0.5,3.5 0,4` |
+| `--payoff` | built-in adjacent-step payoff name | `abs_spread` |
+| `--strike` | strike for spread option payoffs | `0.0` |
+| `--eps` | regularization strengths | `0.3 0.1 0.03` |
+| `--output-dir` | directory for generated causal artifacts | `causal_artifacts` |
+
+### Example
+
+```bash
+mot-causal --n 30 --intervals 1,3 0.5,3.5 0,4 --payoff abs_spread --eps 0.3 0.1 --output-dir causal_out
+```
+
+### Output Files
+
+- `causal_transport_chain.png`
+- `causal_bound_convergence.png`
+- `marginal_evolution.png`
+- `causal_vs_unconstrained.png`
+- `causal_summary.json`
+- `causal_experiment_report.md`
+
 ## Script Entry Points
 
 The repository also includes script wrappers:
 
 - `python scripts/run_uniform_abs_spread.py`
 - `python scripts/generate_example_gallery.py`
+- `python scripts/benchmark_causal.py`
 
 These call the same library entry points as the installed CLI commands.
 
@@ -83,7 +122,8 @@ These call the same library entry points as the installed CLI commands.
 
 1. run `mot-uniform` for a single experiment
 2. inspect `summary.json` and the diagnostics plots
-3. run `mot-gallery` for cross-example comparison
-4. review `gallery_summary.md` and `gallery_casebook.md`
+3. run `mot-causal` for a multi-period chain when adapted constraints matter
+4. run `mot-gallery` for cross-example comparison
+5. review `gallery_summary.md` and `gallery_casebook.md`
 
 This is usually sufficient for basic exploration and documentation generation.
