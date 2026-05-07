@@ -104,7 +104,26 @@ def solve_exact_mot(
     payoff_fn: Callable[[Array2D, Array2D], Array2D],
     objective: Objective = "max",
 ) -> ExactMOTResult:
-    """Solve the discrete martingale optimal transport problem exactly."""
+    """
+    Solve the discrete martingale optimal transport (MOT) problem for two marginals and return the exact optimal coupling.
+    
+    Given source atoms `x_atoms` with weights `alpha` and target atoms `y_atoms` with weights `beta`, builds and solves a linear program that enforces the marginal constraints and the martingale constraint E[Y | X] = X. The provided `payoff_fn` is evaluated on the atom grid to form the linear objective; `objective` selects maximization or minimization of the expected payoff.
+    
+    Parameters:
+        x_atoms: 1-D array of source atom locations.
+        alpha: 1-D probability weights for `x_atoms`.
+        y_atoms: 1-D array of target atom locations.
+        beta: 1-D probability weights for `y_atoms`.
+        payoff_fn: Callable that accepts two 2-D meshgrid arrays (X, Y) and returns a 2-D payoff array shaped (len(x_atoms), len(y_atoms)).
+        objective: Either `"max"` or `"min"`, selecting whether to maximize or minimize the expected payoff.
+    
+    Returns:
+        ExactMOTResult: Contains the solved `plan` (shape (len(x_atoms), len(y_atoms))), the evaluated `payoff_matrix`, the optimal `value` (objective value), `objective` string, and constraint fit errors (`marginal_1_error`, `marginal_2_error`, `martingale_error`). For maximization, `value` is the maximum expected payoff; for minimization, it is the minimum.
+    
+    Raises:
+        ValueError: If `objective` is not `"max"` or `"min"`, if input validation fails (shape/weights/martingale feasibility), or if `payoff_fn` returns an array of incorrect shape.
+        RuntimeError: If the linear program solver fails to find an optimal solution.
+    """
     if objective not in {"max", "min"}:
         raise ValueError("objective must be 'max' or 'min'")
 
@@ -169,6 +188,24 @@ def solve_exact_mot(
 
 
 def _evaluate_multiperiod_payoff(chain, payoff_fn: Callable[..., ArrayND]) -> ArrayND:
+    """
+    Evaluate the multi-period payoff on the Cartesian product of marginal atoms.
+    
+    Parameters:
+        chain: An object with a `marginals` sequence where each marginal exposes `atoms` (1D array-like)
+            and `size` (number of atoms). The function will form a grid over these atoms in the same
+            order as `chain.marginals`.
+        payoff_fn (callable): A function that accepts N arrays (one per marginal) representing the mesh
+            grid coordinates and returns a numeric array whose shape must equal the tuple of marginal
+            sizes.
+    
+    Returns:
+        payoff_tensor (ndarray): A NumPy array of dtype float with shape equal to
+            (marginal.size for marginal in chain.marginals), containing payoff_fn evaluated on the grid.
+    
+    Raises:
+        ValueError: If the array returned by `payoff_fn` does not match the expected grid shape.
+    """
     grids = np.meshgrid(
         *(marginal.atoms for marginal in chain.marginals),
         indexing="ij",
@@ -181,6 +218,19 @@ def _evaluate_multiperiod_payoff(chain, payoff_fn: Callable[..., ArrayND]) -> Ar
 
 
 def _flat_index(indices: tuple[int, ...], shape: tuple[int, ...]) -> int:
+    """
+    Convert a multi-dimensional index into its flat (raveled) index for an array with the given shape.
+    
+    Parameters:
+        indices (tuple[int, ...]): Multi-dimensional index (one integer per axis).
+        shape (tuple[int, ...]): Shape of the array for which the flat index is computed.
+    
+    Returns:
+        flat_index (int): Integer flat index corresponding to `indices` under row-major (C-style) ordering.
+    
+    Raises:
+        ValueError: If any index is out of bounds for the corresponding dimension in `shape`.
+    """
     return int(np.ravel_multi_index(indices, shape))
 
 
@@ -189,7 +239,23 @@ def solve_exact_causal_mot(
     payoff_fn: Callable[..., ArrayND],
     objective: Objective = "max",
 ) -> ExactMOTResult:
-    """Solve the multi-period discrete martingale OT problem exactly."""
+    """
+    Solve the multi-period discrete martingale optimal transport (causal MOT) problem exactly and return the LP solution.
+    
+    Parameters:
+        chain: A multistep marginal chain object with attributes:
+            - marginals: sequence of marginal distributions (each with .atoms and .weights)
+            - step_count: number of transitions (len(marginals) - 1)
+        payoff_fn: Callable that accepts N arrays (one per marginal) produced by an N-dimensional meshgrid and returns an N-dimensional payoff tensor matching the marginals' shape.
+        objective: Either "max" to maximize the expected payoff or "min" to minimize it.
+    
+    Returns:
+        ExactMOTResult containing the solved objective, optimal plan (ND array), the evaluated payoff tensor as `payoff_matrix`, marginal fit errors, martingale fit error, and `causal_plan` set to the ND plan.
+    
+    Raises:
+        ValueError: if `objective` is not "max" or "min".
+        RuntimeError: if the underlying linear program fails to find an optimal solution.
+    """
     if objective not in {"max", "min"}:
         raise ValueError("objective must be 'max' or 'min'")
 
@@ -277,7 +343,18 @@ def compute_causal_bound_gap(
     exact_causal: ExactMOTResult,
     exact_unconstrained: ExactMOTResult,
 ) -> CausalBoundGap:
-    """Return how much an unconstrained upper bound exceeds the causal bound."""
+    """
+    Compute the absolute and relative gap between an unconstrained solution and a causal solution.
+    
+    Parameters:
+        exact_causal (ExactMOTResult): Result produced by the causal solver.
+        exact_unconstrained (ExactMOTResult): Result produced by the unconstrained solver.
+    
+    Returns:
+        CausalBoundGap: `absolute_gap` is exact_unconstrained.value - exact_causal.value;
+        `relative_gap` is `absolute_gap / abs(exact_unconstrained.value)` or `0.0` if
+        `exact_unconstrained.value` is zero.
+    """
     absolute_gap = exact_unconstrained.value - exact_causal.value
     denominator = abs(exact_unconstrained.value)
     relative_gap = 0.0 if denominator == 0.0 else absolute_gap / denominator
