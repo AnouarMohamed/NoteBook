@@ -60,6 +60,39 @@ def test_save_gallery_assets_writes_gallery_summary(tmp_path: Path):
     assert (tmp_path / "small_abs" / "experiment_report.md").exists()
 
 
+def test_save_gallery_assets_handles_causal_and_convergence_specs(tmp_path: Path):
+    specs = (
+        GallerySpec(
+            slug="causal_demo",
+            title="Causal demo",
+            description="Test causal case",
+            n=4,
+            payoff_name="abs_spread",
+            eps_values=(0.2,),
+            causal_intervals=((1.0, 3.0), (0.5, 3.5), (0.0, 4.0)),
+        ),
+        GallerySpec(
+            slug="convergence_demo",
+            title="Convergence demo",
+            description="Test convergence case",
+            x_interval=(1.0, 3.0),
+            y_interval=(0.0, 4.0),
+            n=3,
+            payoff_name="abs_spread",
+            eps_values=(0.2,),
+            convergence_t_values=(2, 3),
+        ),
+    )
+
+    entries = save_gallery_assets(tmp_path, specs)
+
+    assert len(entries) == 2
+    assert (tmp_path / "causal_demo" / "causal_summary.json").exists()
+    assert (tmp_path / "causal_demo" / "causal_experiment_report.md").exists()
+    assert (tmp_path / "convergence_demo" / "continuous_limit.png").exists()
+    assert (tmp_path / "convergence_demo" / "continuous_summary.json").exists()
+
+
 def test_render_gallery_markdown_contains_example_titles(tmp_path: Path):
     specs = (
         GallerySpec(

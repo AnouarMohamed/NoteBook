@@ -692,3 +692,51 @@ def save_causal_experiment_artifacts(output_dir: Path, result) -> None:
     plot_causal_vs_unconstrained(output_dir, result)
     write_causal_summary_json(output_dir, result)
     write_causal_experiment_markdown(output_dir, result)
+
+
+def plot_continuous_limit(output_dir: Path, result) -> None:
+    """Save a continuous-limit convergence plot."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    widths = result.upper_bounds - result.lower_bounds
+
+    figure, axis = plt.subplots(figsize=(8, 5))
+    axis.semilogx(
+        result.T_values,
+        result.upper_bounds,
+        "o-",
+        linewidth=2,
+        color="#cb181d",
+        label="upper",
+    )
+    axis.semilogx(
+        result.T_values,
+        result.lower_bounds,
+        "s-",
+        linewidth=2,
+        color="#3182bd",
+        label="lower",
+    )
+    if result.payoff_name == "abs_spread" and len(result.upper_bounds) > 0:
+        axis.axhline(
+            result.upper_bounds[-1],
+            linestyle="--",
+            linewidth=1.0,
+            color="#636363",
+            label="finest grid reference",
+        )
+    axis.set_title("Causal bounds versus time discretization")
+    axis.set_xlabel("time steps")
+    axis.set_ylabel("expected payoff")
+    axis.grid(alpha=0.3, which="both")
+    axis.legend()
+
+    inset = axis.inset_axes([0.58, 0.13, 0.37, 0.35])
+    inset.loglog(result.T_values, np.maximum(widths, 1e-18), "o-", color="#31a354")
+    inset.set_title(f"width slope {result.convergence_rate:.2f}", fontsize=9)
+    inset.set_xlabel("T", fontsize=8)
+    inset.set_ylabel("width", fontsize=8)
+    inset.grid(alpha=0.25, which="both")
+
+    figure.tight_layout()
+    figure.savefig(output_dir / "continuous_limit.png", bbox_inches="tight")
+    plt.close(figure)

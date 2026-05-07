@@ -22,6 +22,8 @@ markdown_extensions:
   - def_list
   - footnotes
   - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
   - tables
   - toc:
       permalink: true
@@ -36,6 +38,7 @@ nav:
   - Regularization Notes: regularization-notes.md
   - Numerical Notes: numerical-notes.md
   - Causal Benchmarks: causal_benchmarks.md
+  - Causal MOT Theory: theory/causal_mot.md
   - Getting Started: getting-started.md
   - CLI Reference: cli-reference.md
   - Artifact Guide: artifact-guide.md

@@ -9,8 +9,20 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .experiments import DiscreteExperimentResult, run_two_uniform_experiment
-from .reporting import save_experiment_artifacts
+from .continuous import ContinuousLimitResult, ot_bound_vs_timestep
+from .experiments import (
+    CausalExperimentResult,
+    DiscreteExperimentResult,
+    run_causal_experiment,
+    run_two_uniform_experiment,
+)
+from .marginals import CausalMarginalChain
+from .payoffs import make_builtin_payoff
+from .reporting import (
+    plot_continuous_limit,
+    save_causal_experiment_artifacts,
+    save_experiment_artifacts,
+)
 
 
 @dataclass(frozen=True)
@@ -18,18 +30,20 @@ class GallerySpec:
     slug: str
     title: str
     description: str
-    x_interval: tuple[float, float]
-    y_interval: tuple[float, float]
-    n: int
-    payoff_name: str
+    n: int = 20
+    payoff_name: str = "abs_spread"
+    x_interval: tuple[float, float] = (1.0, 3.0)
+    y_interval: tuple[float, float] = (0.0, 4.0)
     strike: float = 0.0
     eps_values: tuple[float, ...] = (0.3, 0.1)
+    causal_intervals: tuple[tuple[float, float], ...] | None = None
+    convergence_t_values: tuple[int, ...] | None = None
 
 
 @dataclass(frozen=True)
 class GalleryEntry:
     spec: GallerySpec
-    experiment: DiscreteExperimentResult
+    experiment: DiscreteExperimentResult | CausalExperimentResult | ContinuousLimitResult
 
 
 @dataclass(frozen=True)
@@ -145,6 +159,41 @@ def builtin_gallery_specs() -> tuple[GallerySpec, ...]:
             strike=0.25,
             eps_values=(0.4, 0.15),
         ),
+        GallerySpec(
+            slug="causal_abs_spread_T3",
+            title="Causal absolute spread T3",
+            description="A three-step causal chain with additive absolute adjacent spread.",
+            n=6,
+            payoff_name="abs_spread",
+            eps_values=(0.2,),
+            causal_intervals=((1.0, 3.0), (0.5, 3.5), (0.0, 4.0)),
+        ),
+        GallerySpec(
+            slug="causal_call_T4",
+            title="Causal call T4",
+            description="A four-step causal chain for a call on adjacent spread.",
+            n=5,
+            payoff_name="call_on_spread",
+            strike=0.25,
+            eps_values=(0.25,),
+            causal_intervals=(
+                (1.0, 3.0),
+                (0.67, 3.33),
+                (0.33, 3.67),
+                (0.0, 4.0),
+            ),
+        ),
+        GallerySpec(
+            slug="causal_convergence_study",
+            title="Causal convergence study",
+            description="A small T=2,3,5 convergence study for additive absolute spread.",
+            x_interval=(1.0, 3.0),
+            y_interval=(0.0, 4.0),
+            n=3,
+            payoff_name="abs_spread",
+            eps_values=(0.2,),
+            convergence_t_values=(2, 3, 5),
+        ),
     )
 
 
@@ -152,30 +201,71 @@ def run_gallery(specs: tuple[GallerySpec, ...]) -> list[GalleryEntry]:
     """Run a list of curated experiment specs."""
     entries: list[GalleryEntry] = []
     for spec in specs:
-        experiment = run_two_uniform_experiment(
-            x_interval=spec.x_interval,
-            y_interval=spec.y_interval,
-            n=spec.n,
-            payoff_name=spec.payoff_name,
-            strike=spec.strike,
-            eps_values=spec.eps_values,
-        )
+        if spec.convergence_t_values is not None:
+            experiment = ot_bound_vs_timestep(
+                spec.x_interval,
+                spec.y_interval,
+                spec.payoff_name,
+                spec.n,
+                T_values=spec.convergence_t_values,
+                eps=min(spec.eps_values),
+            )
+        elif spec.causal_intervals is not None:
+            chain = CausalMarginalChain.from_uniform_intervals(
+                tuple((a, b, spec.n) for a, b in spec.causal_intervals)
+            )
+            experiment = run_causal_experiment(
+                chain,
+                make_builtin_payoff(spec.payoff_name, strike=spec.strike),
+                eps_values=spec.eps_values,
+            )
+        else:
+            experiment = run_two_uniform_experiment(
+                x_interval=spec.x_interval,
+                y_interval=spec.y_interval,
+                n=spec.n,
+                payoff_name=spec.payoff_name,
+                strike=spec.strike,
+                eps_values=spec.eps_values,
+            )
         entries.append(GalleryEntry(spec=spec, experiment=experiment))
     return entries
+
+
+def _entry_bounds(entry: GalleryEntry) -> tuple[float, float, float | None, float | None]:
+    experiment = entry.experiment
+    if isinstance(experiment, ContinuousLimitResult):
+        lower = float(experiment.lower_bounds[-1])
+        upper = float(experiment.upper_bounds[-1])
+        return lower, upper, None, None
+
+    smallest_eps = None
+    smallest_eps_expected = None
+    if experiment.regularized_results:
+        smallest_eps = min(experiment.regularized_results)
+        smallest_result = experiment.regularized_results[smallest_eps]
+        if isinstance(experiment, CausalExperimentResult):
+            smallest_eps_expected = smallest_result.overall_expected_payoff
+        else:
+            smallest_eps_expected = smallest_result.expected_payoff
+    return (
+        experiment.exact_lower.value,
+        experiment.exact_upper.value,
+        smallest_eps,
+        smallest_eps_expected,
+    )
 
 
 def gallery_rows(entries: list[GalleryEntry]) -> list[GalleryRow]:
     """Collect summary rows for a gallery."""
     rows: list[GalleryRow] = []
     for entry in entries:
-        smallest_eps = None
-        smallest_eps_expected = None
+        exact_lower, exact_upper, smallest_eps, smallest_eps_expected = _entry_bounds(
+            entry
+        )
         smallest_eps_bias = None
-        if entry.experiment.regularized_results:
-            smallest_eps = min(entry.experiment.regularized_results)
-            smallest_result = entry.experiment.regularized_results[smallest_eps]
-            smallest_eps_expected = smallest_result.expected_payoff
-            smallest_eps_bias = smallest_result.expected_payoff - entry.experiment.exact_upper.value
+        if smallest_eps_expected is not None:
+            smallest_eps_bias = smallest_eps_expected - exact_upper
 
         rows.append(
             GalleryRow(
@@ -183,9 +273,9 @@ def gallery_rows(entries: list[GalleryEntry]) -> list[GalleryRow]:
                 title=entry.spec.title,
                 payoff_name=entry.spec.payoff_name,
                 strike=entry.spec.strike,
-                exact_lower=entry.experiment.exact_lower.value,
-                exact_upper=entry.experiment.exact_upper.value,
-                width=entry.experiment.exact_upper.value - entry.experiment.exact_lower.value,
+                exact_lower=exact_lower,
+                exact_upper=exact_upper,
+                width=exact_upper - exact_lower,
                 smallest_eps=smallest_eps,
                 smallest_eps_expected=smallest_eps_expected,
                 smallest_eps_bias=smallest_eps_bias,
@@ -227,14 +317,56 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
         "",
     ]
     for entry in entries:
-        smallest_eps = None
-        smallest_expected = None
+        exact_lower, exact_upper, smallest_eps, smallest_expected = _entry_bounds(entry)
         smallest_bias = None
-        if entry.experiment.regularized_results:
-            smallest_eps = min(entry.experiment.regularized_results)
-            result = entry.experiment.regularized_results[smallest_eps]
-            smallest_expected = result.expected_payoff
-            smallest_bias = result.expected_payoff - entry.experiment.exact_upper.value
+        if smallest_expected is not None:
+            smallest_bias = smallest_expected - exact_upper
+
+        if isinstance(entry.experiment, ContinuousLimitResult):
+            configuration = [
+                f"- `x_interval = {entry.spec.x_interval}`",
+                f"- `y_interval = {entry.spec.y_interval}`",
+                f"- `T_values = {entry.spec.convergence_t_values}`",
+            ]
+            figure_lines = [
+                f"![{entry.spec.title} continuous limit]({entry.spec.slug}/continuous_limit.png)"
+            ]
+            file_lines = [
+                f"- [`{entry.spec.slug}/continuous_summary.json`]({entry.spec.slug}/continuous_summary.json)"
+            ]
+        elif isinstance(entry.experiment, CausalExperimentResult):
+            configuration = [
+                f"- `causal_intervals = {entry.spec.causal_intervals}`",
+                f"- `n = {entry.spec.n}`",
+                f"- `payoff = {entry.spec.payoff_name}`",
+                f"- `strike = {entry.spec.strike:.6f}`",
+            ]
+            figure_lines = [
+                f"![{entry.spec.title} transport chain]({entry.spec.slug}/causal_transport_chain.png)",
+                "",
+                f"![{entry.spec.title} marginal evolution]({entry.spec.slug}/marginal_evolution.png)",
+            ]
+            file_lines = [
+                f"- [`{entry.spec.slug}/causal_experiment_report.md`]({entry.spec.slug}/causal_experiment_report.md)",
+                f"- [`{entry.spec.slug}/causal_summary.json`]({entry.spec.slug}/causal_summary.json)",
+            ]
+        else:
+            configuration = [
+                f"- `x_interval = {entry.spec.x_interval}`",
+                f"- `y_interval = {entry.spec.y_interval}`",
+                f"- `n = {entry.spec.n}`",
+                f"- `payoff = {entry.spec.payoff_name}`",
+                f"- `strike = {entry.spec.strike:.6f}`",
+            ]
+            figure_lines = [
+                f"![{entry.spec.title} exact summary]({entry.spec.slug}/exact_uniform_summary.png)",
+                "",
+                f"![{entry.spec.title} structural diagnostics]({entry.spec.slug}/structural_diagnostics.png)",
+            ]
+            file_lines = [
+                f"- [`{entry.spec.slug}/experiment_report.md`]({entry.spec.slug}/experiment_report.md)",
+                f"- [`{entry.spec.slug}/summary.json`]({entry.spec.slug}/summary.json)",
+            ]
 
         lines.extend(
             [
@@ -244,11 +376,7 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
                 "",
                 "### Configuration",
                 "",
-                f"- `x_interval = {entry.spec.x_interval}`",
-                f"- `y_interval = {entry.spec.y_interval}`",
-                f"- `n = {entry.spec.n}`",
-                f"- `payoff = {entry.spec.payoff_name}`",
-                f"- `strike = {entry.spec.strike:.6f}`",
+                *configuration,
                 "",
                 "### Exact Results",
                 "",
@@ -256,11 +384,7 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
                 "",
                 "| Lower | Upper | Width |",
                 "|---|---|---|",
-                (
-                    f"| {entry.experiment.exact_lower.value:.6f} | "
-                    f"{entry.experiment.exact_upper.value:.6f} | "
-                    f"{entry.experiment.exact_upper.value - entry.experiment.exact_lower.value:.6f} |"
-                ),
+                f"| {exact_lower:.6f} | {exact_upper:.6f} | {exact_upper - exact_lower:.6f} |",
                 "",
                 "</div>",
             ]
@@ -287,14 +411,11 @@ def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
                 "",
                 "### Figures",
                 "",
-                f"![{entry.spec.title} exact summary]({entry.spec.slug}/exact_uniform_summary.png)",
-                "",
-                f"![{entry.spec.title} structural diagnostics]({entry.spec.slug}/structural_diagnostics.png)",
+                *figure_lines,
                 "",
                 "### Files",
                 "",
-                f"- [`{entry.spec.slug}/experiment_report.md`]({entry.spec.slug}/experiment_report.md)",
-                f"- [`{entry.spec.slug}/summary.json`]({entry.spec.slug}/summary.json)",
+                *file_lines,
                 "",
             ]
         )
@@ -342,7 +463,24 @@ def save_gallery_assets(output_dir: Path, specs: tuple[GallerySpec, ...]) -> lis
 
     for entry in entries:
         example_dir = output_dir / entry.spec.slug
-        save_experiment_artifacts(example_dir, entry.experiment)
+        if isinstance(entry.experiment, ContinuousLimitResult):
+            example_dir.mkdir(parents=True, exist_ok=True)
+            plot_continuous_limit(example_dir, entry.experiment)
+            continuous_summary = {
+                "T_values": entry.experiment.T_values.tolist(),
+                "upper_bounds": entry.experiment.upper_bounds.tolist(),
+                "lower_bounds": entry.experiment.lower_bounds.tolist(),
+                "convergence_rate": entry.experiment.convergence_rate,
+                "payoff_name": entry.experiment.payoff_name,
+                "eps": entry.experiment.eps,
+            }
+            (example_dir / "continuous_summary.json").write_text(
+                json.dumps(continuous_summary, indent=2), encoding="utf-8"
+            )
+        elif isinstance(entry.experiment, CausalExperimentResult):
+            save_causal_experiment_artifacts(example_dir, entry.experiment)
+        else:
+            save_experiment_artifacts(example_dir, entry.experiment)
 
     rows = gallery_rows(entries)
     save_gallery_overview(output_dir, rows)

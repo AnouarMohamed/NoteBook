@@ -8,6 +8,7 @@ from .causal_regularized import (
     causal_sinkhorn_mot,
     reconstruct_causal_plan,
 )
+from .continuous import ContinuousLimitResult, ot_bound_vs_timestep
 from .discretization import make_uniform_grid
 from .exact import (
     CausalBoundGap,
@@ -47,7 +48,11 @@ from .marginals import (
 )
 from .payoffs import PayoffSpec, builtin_payoff_names, make_builtin_payoff
 from .regularized import RegularizedMOTResult, sinkhorn_mot
-from .reporting import save_causal_experiment_artifacts, save_experiment_artifacts
+from .reporting import (
+    plot_continuous_limit,
+    save_causal_experiment_artifacts,
+    save_experiment_artifacts,
+)
 
 __version__ = "0.5.0"
 
@@ -59,6 +64,7 @@ __all__ = [
     "CausalMOTResult",
     "CausalBoundGap",
     "CausalExperimentResult",
+    "ContinuousLimitResult",
     "ConvexOrderCheck",
     "DiscreteExperimentResult",
     "DiscreteMarginal",
@@ -83,6 +89,8 @@ __all__ = [
     "make_discrete_marginal",
     "make_uniform_grid",
     "make_uniform_marginal",
+    "ot_bound_vs_timestep",
+    "plot_continuous_limit",
     "gallery_rows",
     "run_causal_experiment",
     "run_discrete_experiment",
