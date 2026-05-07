@@ -9,7 +9,14 @@ from .causal_regularized import (
     reconstruct_causal_plan,
 )
 from .discretization import make_uniform_grid
-from .exact import ExactMOTResult, constraint_errors, solve_exact_mot
+from .exact import (
+    CausalBoundGap,
+    ExactMOTResult,
+    compute_causal_bound_gap,
+    constraint_errors,
+    solve_exact_causal_mot,
+    solve_exact_mot,
+)
 from .experiments import (
     DiscreteExperimentResult,
     UniformExperimentResult,
@@ -48,6 +55,7 @@ __all__ = [
     "CausalFeasibilityReport",
     "CausalMarginalChain",
     "CausalMOTResult",
+    "CausalBoundGap",
     "ConvexOrderCheck",
     "DiscreteExperimentResult",
     "DiscreteMarginal",
@@ -66,6 +74,7 @@ __all__ = [
     "causal_sinkhorn_mot",
     "check_causal_feasibility",
     "check_convex_order_discrete",
+    "compute_causal_bound_gap",
     "constraint_errors",
     "make_builtin_payoff",
     "make_discrete_marginal",
@@ -80,5 +89,6 @@ __all__ = [
     "save_experiment_artifacts",
     "save_gallery_assets",
     "sinkhorn_mot",
+    "solve_exact_causal_mot",
     "solve_exact_mot",
 ]

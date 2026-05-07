@@ -35,6 +35,7 @@ nav:
   - Research Notes: research-notes.md
   - Regularization Notes: regularization-notes.md
   - Numerical Notes: numerical-notes.md
+  - Causal Benchmarks: causal_benchmarks.md
   - Getting Started: getting-started.md
   - CLI Reference: cli-reference.md
   - Artifact Guide: artifact-guide.md
