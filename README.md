@@ -5,7 +5,7 @@
 ![PyPI](https://img.shields.io/pypi/v/mot-pricing)
 ![Python](https://img.shields.io/pypi/pyversions/mot-pricing)
 
-`mot-pricing` is a small research-oriented Python package for robust pricing with martingale optimal transport (MOT). It began as a single notebook and was reorganized into a reusable library with exact discrete solvers, entropy-regularized approximations, reporting utilities, and a documented gallery of experiments.
+`mot-pricing` is a small research-oriented Python package for robust pricing with martingale optimal transport (MOT). It began as a single notebook and was reorganized into a reusable library with exact discrete solvers, entropy-regularized approximations, causal multi-period workflows, reporting utilities, and a documented gallery of experiments.
 
 ## Mathematical Setting
 
@@ -25,23 +25,27 @@ For discrete marginals, the exact problem is formulated as a linear program over
 
 The exact LP solution is used as the benchmark for the discrete problem, while the entropy-regularized solver provides approximation paths across values of `eps`.
 
+The package also supports causal multi-period chains `(S1, ..., ST)` with fixed marginals at every time step and adapted martingale constraints between consecutive dates.
+
 ## Main Features
 
 The repository includes:
 
 - an exact linear-programming solver for discrete MOT
 - a numerically stabilized entropy-regularized solver
+- causal marginal chains, exact causal LPs, and regularized causal approximations
 - discrete marginal utilities and convex-order feasibility checks
 - a built-in payoff library for spread-type payoffs
-- experiment runners for arbitrary discrete marginals and two-uniform systems
+- experiment runners for arbitrary discrete marginals, two-uniform systems, and causal chains
 - reporting helpers for figures, diagnostics, JSON summaries, and markdown reports
-- a curated gallery runner with cross-example summary files
+- continuous time-step convergence studies
+- a curated gallery runner with two-period and causal examples
 - tests for exact, regularized, and reporting workflows
 - documentation, CI, release workflows, and package publishing workflows
 
 ## Current Gallery
 
-The shipped gallery currently contains nine built-in examples:
+The shipped gallery currently contains twelve built-in examples:
 
 - uniform absolute spread
 - call on spread
@@ -52,8 +56,11 @@ The shipped gallery currently contains nine built-in examples:
 - wide absolute spread
 - wide put on spread
 - broad spread straddle
+- causal absolute spread T3
+- causal call T4
+- causal convergence study
 
-These examples cover directional payoffs, symmetric payoffs, widened second marginals, and a quadratic case whose interval nearly collapses in the present discretization.
+These examples cover directional payoffs, symmetric payoffs, widened second marginals, a quadratic case whose interval nearly collapses in the present discretization, and causal multi-period chains.
 
 ## Standard Artifacts
 
@@ -65,6 +72,15 @@ A single experiment run produces:
 - `structural_diagnostics.png`
 - `summary.json`
 - `experiment_report.md`
+
+A causal experiment run produces:
+
+- `causal_transport_chain.png`
+- `causal_bound_convergence.png`
+- `marginal_evolution.png`
+- `causal_vs_unconstrained.png`
+- `causal_summary.json`
+- `causal_experiment_report.md`
 
 A gallery run additionally produces:
 
@@ -115,6 +131,12 @@ Custom payoff example:
 mot-uniform --n 60 --x-interval 1 3 --y-interval 0 4 --payoff call_on_spread --strike 0.25 --eps 0.3 0.1 --output-dir artifacts_call
 ```
 
+Causal multi-period example:
+
+```bash
+mot-causal --n 30 --intervals 1,3 0.5,3.5 0,4 --payoff abs_spread --eps 0.3 0.1 --output-dir causal_out
+```
+
 ## Python Usage
 
 ```python
@@ -133,11 +155,35 @@ save_experiment_artifacts(Path("artifacts_demo"), experiment)
 print(experiment.exact_lower.value, experiment.exact_upper.value)
 ```
 
+Causal chain usage:
+
+```python
+from pathlib import Path
+from mot_pricing import (
+    CausalMarginalChain,
+    make_builtin_payoff,
+    run_causal_experiment,
+    save_causal_experiment_artifacts,
+)
+
+chain = CausalMarginalChain.from_uniform_intervals(
+    ((1.0, 3.0, 12), (0.5, 3.5, 12), (0.0, 4.0, 12))
+)
+experiment = run_causal_experiment(
+    chain,
+    make_builtin_payoff("abs_spread"),
+    eps_values=(0.2,),
+)
+save_causal_experiment_artifacts(Path("causal_demo"), experiment)
+print(experiment.exact_lower.value, experiment.exact_upper.value)
+```
+
 ## Documentation
 
 The documentation site is available at `https://anouarmohamed.github.io/NoteBook/` and includes:
 
 - a discrete formulation page
+- causal MOT theory and benchmark pages
 - research, regularization, and numerical notes
 - getting-started instructions and CLI reference
 - an artifact guide for generated files
