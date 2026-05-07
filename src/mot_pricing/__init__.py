@@ -20,8 +20,11 @@ from .gallery import (
     save_gallery_assets,
 )
 from .marginals import (
+    CausalFeasibilityReport,
+    CausalMarginalChain,
     ConvexOrderCheck,
     DiscreteMarginal,
+    check_causal_feasibility,
     check_convex_order_discrete,
     make_discrete_marginal,
     make_uniform_marginal,
@@ -34,6 +37,8 @@ __version__ = "0.5.0"
 
 __all__ = [
     "__version__",
+    "CausalFeasibilityReport",
+    "CausalMarginalChain",
     "ConvexOrderCheck",
     "DiscreteExperimentResult",
     "DiscreteMarginal",
@@ -48,6 +53,7 @@ __all__ = [
     "abs_spread_uniform_benchmarks",
     "builtin_gallery_specs",
     "builtin_payoff_names",
+    "check_causal_feasibility",
     "check_convex_order_discrete",
     "constraint_errors",
     "make_builtin_payoff",

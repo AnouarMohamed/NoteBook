@@ -96,6 +96,61 @@ class ConvexOrderCheck:
     strikes: Array1D
 
 
+@dataclass(frozen=True)
+class CausalMarginalChain:
+    marginals: tuple[DiscreteMarginal, ...]
+
+    def __post_init__(self) -> None:
+        marginals = tuple(self.marginals)
+        if len(marginals) < 2:
+            raise ValueError("causal marginal chains require at least two marginals")
+
+        for step, (marginal_1, marginal_2) in enumerate(
+            zip(marginals[:-1], marginals[1:]), start=1
+        ):
+            mean_gap = marginal_2.mean - marginal_1.mean
+            if not np.isclose(mean_gap, 0.0, atol=1e-10):
+                raise ValueError(
+                    "martingale feasibility requires consecutive matching means: "
+                    f"step={step}, mean_gap={mean_gap:.3e}"
+                )
+
+        object.__setattr__(self, "marginals", marginals)
+
+    @property
+    def marginal_count(self) -> int:
+        return len(self.marginals)
+
+    @property
+    def step_count(self) -> int:
+        return self.marginal_count - 1
+
+    def pairs(self) -> tuple[tuple[DiscreteMarginal, DiscreteMarginal], ...]:
+        return tuple(zip(self.marginals[:-1], self.marginals[1:]))
+
+    @classmethod
+    def from_uniform_intervals(
+        cls,
+        intervals: list[tuple[float, float, int]]
+        | tuple[tuple[float, float, int], ...],
+    ) -> "CausalMarginalChain":
+        marginals = tuple(
+            make_uniform_marginal(a, b, n, name=f"S{index}")
+            for index, (a, b, n) in enumerate(intervals, start=1)
+        )
+        return cls(marginals=marginals)
+
+
+@dataclass(frozen=True)
+class CausalFeasibilityReport:
+    feasible: bool
+    mean_gaps: Array1D
+    min_call_gaps: Array1D
+    max_call_gaps: Array1D
+    step_checks: tuple[ConvexOrderCheck, ...]
+    summary: str
+
+
 def check_convex_order_discrete(
     marginal_1: DiscreteMarginal,
     marginal_2: DiscreteMarginal,
@@ -129,4 +184,51 @@ def check_convex_order_discrete(
         min_call_gap=min_call_gap,
         max_call_gap=max_call_gap,
         strikes=strike_vector,
+    )
+
+
+def check_causal_feasibility(
+    chain: CausalMarginalChain,
+    *,
+    tol: float = 1e-10,
+) -> CausalFeasibilityReport:
+    """Check consecutive convex-order feasibility across a causal marginal chain."""
+    step_checks = tuple(
+        check_convex_order_discrete(marginal_1, marginal_2, tol=tol)
+        for marginal_1, marginal_2 in chain.pairs()
+    )
+    mean_gaps = np.array([check.mean_gap for check in step_checks], dtype=float)
+    min_call_gaps = np.array(
+        [check.min_call_gap for check in step_checks], dtype=float
+    )
+    max_call_gaps = np.array(
+        [check.max_call_gap for check in step_checks], dtype=float
+    )
+    feasible = all(check.feasible for check in step_checks)
+
+    if feasible:
+        summary = (
+            f"causal chain feasible across {chain.step_count} steps; "
+            f"max_abs_mean_gap={np.max(np.abs(mean_gaps)):.3e}, "
+            f"min_call_gap={np.min(min_call_gaps):.3e}"
+        )
+    else:
+        failed_steps = [
+            str(index)
+            for index, check in enumerate(step_checks, start=1)
+            if not check.feasible
+        ]
+        summary = (
+            f"causal chain infeasible at step(s) {', '.join(failed_steps)}; "
+            f"max_abs_mean_gap={np.max(np.abs(mean_gaps)):.3e}, "
+            f"min_call_gap={np.min(min_call_gaps):.3e}"
+        )
+
+    return CausalFeasibilityReport(
+        feasible=feasible,
+        mean_gaps=mean_gaps,
+        min_call_gaps=min_call_gaps,
+        max_call_gaps=max_call_gaps,
+        step_checks=step_checks,
+        summary=summary,
     )
