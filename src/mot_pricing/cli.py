@@ -12,6 +12,14 @@ from .reporting import save_causal_experiment_artifacts, save_experiment_artifac
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """
+    Constructs an ArgumentParser configured for running two-uniform martingale optimal transport experiments.
+    
+    The parser includes options to set the number of midpoint atoms, the two support intervals (S1 and S2), a built-in payoff name and strike, a list of regularization strengths, and an output directory for generated artifacts.
+    
+    Returns:
+        argparse.ArgumentParser: A configured parser for the two-uniform MOT experiment CLI.
+    """
     parser = argparse.ArgumentParser(
         description="Run configurable two-uniform martingale optimal transport experiments."
     )
@@ -61,6 +69,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """
+    Run the two-uniform MOT experiment from command-line arguments and save its artifacts.
+    
+    Parses CLI arguments, executes the configurable two-uniform experiment, ensures the configured output directory exists, prints summary results (exact bounds, payoff description, convex-order diagnostics, optional unrestricted benchmarks, and optional regularized results), and writes experiment artifacts to disk.
+    """
     parser = build_parser()
     args = parser.parse_args()
 
@@ -110,6 +123,18 @@ def main() -> None:
 
 
 def _parse_interval(value: str) -> tuple[float, float]:
+    """
+    Parse an interval string of the form "A,B" into a pair of floats.
+    
+    Parameters:
+        value (str): Interval formatted as "A,B" where A and B are numeric.
+    
+    Returns:
+        tuple[float, float]: The parsed interval bounds (A, B).
+    
+    Raises:
+        argparse.ArgumentTypeError: If the input is not exactly two comma-separated parts or if either bound cannot be converted to float.
+    """
     parts = value.split(",")
     if len(parts) != 2:
         raise argparse.ArgumentTypeError("intervals must be formatted as a,b")
@@ -120,6 +145,14 @@ def _parse_interval(value: str) -> tuple[float, float]:
 
 
 def build_causal_parser() -> argparse.ArgumentParser:
+    """
+    Create an ArgumentParser configured for causal multi-period martingale optimal transport (MOT) experiments.
+    
+    The parser includes options for atoms per time step (`--n`), per-time-step support intervals (`--intervals`, each formatted as "A,B" and parsed by `_parse_interval`), built-in payoff selection (`--payoff`), payoff strike (`--strike`), regularization strengths (`--eps`), and an output directory (`--output-dir`).
+    
+    Returns:
+        argparse.ArgumentParser: Configured parser for the causal experimental CLI.
+    """
     parser = argparse.ArgumentParser(
         description="Run causal multi-period martingale optimal transport experiments."
     )
@@ -161,6 +194,11 @@ def build_causal_parser() -> argparse.ArgumentParser:
 
 
 def main_causal() -> None:
+    """
+    Run a causal multi-period MOT experiment driven by command-line arguments.
+    
+    Parses CLI options, constructs a causal marginal chain and payoff, executes the causal experiment for the requested regularization strengths, prints exact and regularized summary statistics (exact lower/upper values, pairwise upper benchmark, causal gap, and per-epsilon expected payoff and convergence), and writes experiment artifacts to the configured output directory.
+    """
     parser = build_causal_parser()
     args = parser.parse_args()
     interval_specs = tuple((a, b, args.n) for a, b in args.intervals)

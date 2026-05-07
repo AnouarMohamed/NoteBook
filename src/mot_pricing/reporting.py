@@ -461,7 +461,19 @@ def save_experiment_artifacts(output_dir: Path, experiment) -> None:
 
 
 def plot_causal_transport_chain(output_dir: Path, result) -> None:
-    """Save per-step causal transport heatmaps."""
+    """
+    Save a grid of per-step causal transport heatmaps to causal_transport_chain.png in output_dir.
+    
+    Creates one subplot per step showing the (step, step+1) coupling plan over the atom ranges of the corresponding marginals. If regularized results are available, uses the plans from the smallest regularization epsilon; otherwise aggregates the exact plan to each adjacent pair of time steps.
+    
+    Parameters:
+        output_dir (Path): Directory where causal_transport_chain.png will be written.
+        result: Result object containing a time chain and coupling data. Expected attributes:
+            - chain.marginals: sequence of marginals where each marginal has `atoms` (1-D array-like).
+            - chain.step_count (int): number of steps (subplots).
+            - regularized_results (optional): mapping of eps -> regularization result, where the chosen entry should provide `.steps[*].plan`.
+            - exact_upper.plan: fallback multidimensional coupling used when regularized results are not present.
+    """
     plans = []
     if result.regularized_results:
         smallest_eps = min(result.regularized_results)
@@ -503,7 +515,17 @@ def plot_causal_transport_chain(output_dir: Path, result) -> None:
 
 
 def plot_causal_bound_convergence(output_dir: Path, result) -> None:
-    """Save causal bound convergence against regularization strength."""
+    """
+    Plot and save the convergence of the causal bound as a function of regularization strength.
+    
+    Creates a semilog-x plot of the overall expected payoff from each regularized run versus epsilon, overlays a horizontal reference at the exact causal upper bound, and writes the figure to "causal_bound_convergence.png" in output_dir. If result.regularized_results is empty or falsy, the function does nothing.
+    
+    Parameters:
+        output_dir (Path): Directory where the PNG file will be saved.
+        result: Experiment/result object with attributes
+            - regularized_results: a mapping from epsilon to per-epsilon results containing `overall_expected_payoff`.
+            - exact_upper.value: numeric exact causal upper bound used for the reference line.
+    """
     if not result.regularized_results:
         return
     eps_values = sorted(result.regularized_results)
@@ -530,7 +552,15 @@ def plot_causal_bound_convergence(output_dir: Path, result) -> None:
 
 
 def plot_marginal_evolution(output_dir: Path, result) -> None:
-    """Save marginal distributions across causal time steps."""
+    """
+    Plot the evolution of marginal distributions across causal time steps and save the figure.
+    
+    Parameters:
+        output_dir (Path): Directory where "marginal_evolution.png" will be written.
+        result: Object containing a `chain.marginals` sequence; each marginal must provide
+            `atoms` (array-like), `weights` (array-like), and an optional `name` (str) used
+            for the plot legend.
+    """
     figure, axis = plt.subplots(figsize=(8, 4.5))
     for index, marginal in enumerate(result.chain.marginals, start=1):
         axis.plot(
@@ -551,7 +581,13 @@ def plot_marginal_evolution(output_dir: Path, result) -> None:
 
 
 def plot_causal_vs_unconstrained(output_dir: Path, result) -> None:
-    """Save causal exact and pairwise benchmark comparison."""
+    """
+    Save a bar chart comparing causal and pairwise bounds for the experiment.
+    
+    Parameters:
+        output_dir (Path): Directory where "causal_vs_unconstrained.png" will be written.
+        result: Result object providing `pairwise_lower_bound`, `exact_lower.value`, `exact_upper.value`, and `pairwise_upper_bound` used to build the bars.
+    """
     labels = ["pairwise lower", "causal lower", "causal upper", "pairwise upper"]
     values = [
         result.pairwise_lower_bound,
@@ -571,7 +607,19 @@ def plot_causal_vs_unconstrained(output_dir: Path, result) -> None:
 
 
 def write_causal_summary_json(output_dir: Path, result) -> None:
-    """Write a machine-readable causal experiment summary."""
+    """
+    Write a machine-readable JSON summary of a causal experiment to output_dir/causal_summary.json.
+    
+    The JSON contains:
+    - step_count: number of time steps in the causal chain.
+    - payoff: object with `name`, `description`, and `strike`.
+    - marginals: list of marginal metadata objects (`name`, `size`, `mean`, `variance`) for each time step.
+    - feasibility: feasibility flag and arrays converted to lists (`mean_gaps`, `min_call_gaps`, `max_call_gaps`) plus a textual `summary`.
+    - exact: exact causal bounds (`lower`, `upper`) and `martingale_error`.
+    - pairwise_bounds: unconstrained pairwise lower and upper bounds.
+    - causal_bound_gap: `absolute` and `relative` gap between pairwise and causal bounds.
+    - regularized: mapping keyed by formatted epsilon strings to objects containing `overall_expected_payoff`, `converged`, `per_step_dual_gap` (as a list), and maximum constraint errors (`max_marginal_error`, `max_martingale_error`).
+    """
     summary = {
         "step_count": result.step_count,
         "payoff": {
@@ -684,7 +732,21 @@ def write_causal_experiment_markdown(output_dir: Path, result) -> None:
 
 
 def save_causal_experiment_artifacts(output_dir: Path, result) -> None:
-    """Save standard artifacts for a causal experiment."""
+    """
+    Save all standard artifacts for a causal (multi-step) MOT experiment into output_dir.
+    
+    This creates plots and reports used for analysis and reproducibility. Generated files:
+    - causal_transport_chain.png
+    - causal_bound_convergence.png (only if regularized results exist)
+    - marginal_evolution.png
+    - causal_vs_unconstrained.png
+    - causal_summary.json
+    - causal_experiment_report.md
+    
+    Parameters:
+        output_dir (Path): Directory where artifacts will be written; created if it does not exist.
+        result: Causal experiment result object containing chain, bounds, regularized results, and payoff metadata.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     plot_causal_transport_chain(output_dir, result)
     plot_causal_bound_convergence(output_dir, result)
@@ -695,7 +757,18 @@ def save_causal_experiment_artifacts(output_dir: Path, result) -> None:
 
 
 def plot_continuous_limit(output_dir: Path, result) -> None:
-    """Save a continuous-limit convergence plot."""
+    """
+    Create and save a plot showing causal upper and lower bounds across time discretizations with an inset visualizing the width convergence.
+    
+    Parameters:
+        output_dir (Path): Directory where "continuous_limit.png" will be written; the directory is created if it does not exist.
+        result: Object providing the plotting data with the following attributes:
+            - T_values: sequence of time-discretization sizes (plotted on a log-x scale).
+            - upper_bounds: sequence of upper bound values corresponding to T_values.
+            - lower_bounds: sequence of lower bound values corresponding to T_values.
+            - payoff_name: string identifier used to conditionally add a finest-grid horizontal reference (expects "abs_spread" for that behavior).
+            - convergence_rate: numeric value displayed in the inset title describing the observed convergence slope.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     widths = result.upper_bounds - result.lower_bounds
 

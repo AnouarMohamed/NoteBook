@@ -61,7 +61,12 @@ class GalleryRow:
 
 
 def builtin_gallery_specs() -> tuple[GallerySpec, ...]:
-    """Return a curated set of interesting examples for docs and demos."""
+    """
+    Curated GallerySpec examples covering discrete two-uniform experiments, causal-chain setups, and a continuous-limit convergence study for documentation and demos.
+    
+    Returns:
+        tuple[GallerySpec, ...]: A fixed sequence of predefined gallery specifications (absolute spread, call/put spreads, quadratic/squared-distance, straddle variants, several causal-chain examples, and a small convergence study) ready to be consumed by the gallery runners.
+    """
     return (
         GallerySpec(
             slug="uniform_abs_spread",
@@ -198,7 +203,20 @@ def builtin_gallery_specs() -> tuple[GallerySpec, ...]:
 
 
 def run_gallery(specs: tuple[GallerySpec, ...]) -> list[GalleryEntry]:
-    """Run a list of curated experiment specs."""
+    """
+    Run each GallerySpec and return a GalleryEntry pairing the spec with its executed experiment.
+    
+    For each spec:
+    - If `convergence_t_values` is set, runs a continuous-limit study via `ot_bound_vs_timestep` using `eps=min(spec.eps_values)`.
+    - Else if `causal_intervals` is set, builds a CausalMarginalChain from the uniform intervals and runs a causal experiment.
+    - Otherwise runs a discrete two-uniform experiment.
+    
+    Parameters:
+        specs (tuple[GallerySpec, ...]): Iterable of gallery specifications to execute.
+    
+    Returns:
+        list[GalleryEntry]: A list of entries where each entry pairs the original spec with its resulting experiment.
+    """
     entries: list[GalleryEntry] = []
     for spec in specs:
         if spec.convergence_t_values is not None:
@@ -233,6 +251,20 @@ def run_gallery(specs: tuple[GallerySpec, ...]) -> list[GalleryEntry]:
 
 
 def _entry_bounds(entry: GalleryEntry) -> tuple[float, float, float | None, float | None]:
+    """
+    Extract numeric bounds and (when available) the smallest-regularization expected payoff from a GalleryEntry.
+    
+    Parameters:
+        entry (GalleryEntry): Gallery entry whose experiment may be a discrete, causal, or continuous-limit result.
+    
+    Returns:
+        tuple[float, float, float | None, float | None]:
+            A 4-tuple (exact_lower, exact_upper, smallest_eps, smallest_eps_expected):
+            - exact_lower: the experiment's exact lower bound (for continuous-limit, the final timestep lower bound).
+            - exact_upper: the experiment's exact upper bound (for continuous-limit, the final timestep upper bound).
+            - smallest_eps: the smallest regularization level present in the experiment's regularized results, or `None` if not applicable.
+            - smallest_eps_expected: the expected payoff at `smallest_eps` (for causal experiments uses `overall_expected_payoff`), or `None` if not applicable.
+    """
     experiment = entry.experiment
     if isinstance(experiment, ContinuousLimitResult):
         lower = float(experiment.lower_bounds[-1])
@@ -257,7 +289,22 @@ def _entry_bounds(entry: GalleryEntry) -> tuple[float, float, float | None, floa
 
 
 def gallery_rows(entries: list[GalleryEntry]) -> list[GalleryRow]:
-    """Collect summary rows for a gallery."""
+    """
+    Build summary rows for a collection of gallery entries, producing numeric summaries used for reports and visualizations.
+    
+    For each entry, extracts exact bounds and (when available) the smallest regularization level and its expected payoff, computes interval width and bias to the exact upper bound, and returns a list of populated GalleryRow objects.
+    
+    Parameters:
+        entries (list[GalleryEntry]): Experiment entries to summarize.
+    
+    Returns:
+        list[GalleryRow]: Summary rows containing identifiers from each spec plus numeric fields:
+            - exact_lower, exact_upper: exact robust interval bounds
+            - width: exact_upper - exact_lower
+            - smallest_eps: smallest regularization epsilon when available, otherwise None
+            - smallest_eps_expected: expected payoff at smallest_eps when available, otherwise None
+            - smallest_eps_bias: smallest_eps_expected minus exact_upper when smallest_eps_expected is available, otherwise None
+    """
     rows: list[GalleryRow] = []
     for entry in entries:
         exact_lower, exact_upper, smallest_eps, smallest_eps_expected = _entry_bounds(
@@ -309,7 +356,15 @@ def render_gallery_markdown(rows: list[GalleryRow]) -> str:
 
 
 def render_gallery_casebook(entries: list[GalleryEntry]) -> str:
-    """Render a longer markdown report for the full gallery."""
+    """
+    Produce a detailed markdown casebook that documents each gallery entry.
+    
+    Parameters:
+        entries (list[GalleryEntry]): Ordered list of gallery entries to include; each entry's spec, computed results, and type determine the sections, figures, and files emitted for that example.
+    
+    Returns:
+        markdown (str): A markdown document string with one section per entry containing configuration, exact results (numeric table), optional smallest-regularization summary, figures, and links to per-example files.
+    """
     lines = [
         "# Gallery Casebook",
         "",
@@ -457,7 +512,27 @@ def save_gallery_overview(output_dir: Path, rows: list[GalleryRow]) -> None:
 
 
 def save_gallery_assets(output_dir: Path, specs: tuple[GallerySpec, ...]) -> list[GalleryEntry]:
-    """Run a gallery and write all per-example and summary artifacts."""
+    """
+    Run the supplied gallery specifications, persist per-example artifacts and cross-example summaries, and return the executed entries.
+    
+    For each spec this function runs the appropriate experiment and writes type-dependent artifacts under output_dir/<slug>:
+    - Continuous-limit experiments: save a plot and a `continuous_summary.json` containing `T_values`, `upper_bounds`, `lower_bounds`, `convergence_rate`, `payoff_name`, and `eps`.
+    - Causal experiments: delegate saving to `save_causal_experiment_artifacts`.
+    - Discrete two-uniform experiments: delegate saving to `save_experiment_artifacts`.
+    
+    After processing all examples the function writes:
+    - `gallery_overview.png` (visual summary),
+    - `gallery_summary.json` (list of per-row summaries),
+    - `gallery_summary.md` (markdown table), and
+    - `gallery_casebook.md` (detailed per-example casebook).
+    
+    Parameters:
+        output_dir (Path): Directory to create (if necessary) and write all artifacts into.
+        specs (tuple[GallerySpec, ...]): Tuple of gallery specifications to run.
+    
+    Returns:
+        list[GalleryEntry]: The list of gallery entries produced by running the experiments.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     entries = run_gallery(specs)
 
